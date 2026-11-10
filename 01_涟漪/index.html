@@ -215,6 +215,8 @@
   var SMOOTH = 0.06;      // 每帧一次轻度扩散，压掉网格尺度的毛刺
   var NORM = 14;          // 高度梯度 → 法线强度
   var subSteps = 2;       // 每帧物理子步
+  var RES_MS = 3000;      // 同一处连点三下：驻波持续多久
+  var SETTLE_MS = 3000;   // 驻波结束后，余波退回静水所需的时间
 
   var LX = -0.44, LY = -0.56, LZ = 0.70;          // 光向
   var t0 = Math.sqrt(LX * LX + LY * LY + LZ * LZ);
@@ -333,7 +335,7 @@
   /* ------------------------------------------------------------------ *
    *  物理：一步差分 + 边缘吸收
    * ------------------------------------------------------------------ */
-  function step() {
+  function step(extra) {
     var g = GW, h = GH, i, y, end;
     for (y = 1; y < h - 1; y++) {
       i = y * g + 1;
@@ -342,6 +344,7 @@
         var c = cur[i];
         var v = 2 * c - prev[i] + C2 * (cur[i - 1] + cur[i + 1] + cur[i - g] + cur[i + g] - 4 * c);
         v *= DAMP;
+        if (extra !== 1) v *= extra;
         if (v > 8) v = 8; else if (v < -8) v = -8;
         prev[i] = v;
       }
@@ -732,6 +735,7 @@
   var lastInteract = (window.performance && performance.now) ? performance.now() : Date.now();
   var sources = [];
   var clicks = [];
+  var settleFrom = 0, settleTo = 0;    // 驻波结束后的回稳窗口
   var rainMode = false, rainAt = 0, dewMode = false, dewAt = 0;
 
   function nowMs() {
@@ -781,16 +785,21 @@
     }
   }
 
-  /* 彩蛋：同一处连点三次 → 驻波 */
+  /* 彩蛋：同一处连点三次 → 驻波
+     同一时刻只留一个源：连点不会叠加驱动。否则落点被持续泵入能量，
+     停手后仍会久久"冒波"，看起来像那个地方卡住了。 */
   function startResonance(gx, gy) {
-    if (sources.length >= 3) sources.shift();
+    if (sources.length) return;
+    var dur = reduce ? 2200 : RES_MS;
     sources.push({
       gx: gx, gy: gy, t0: nowMs(),
-      dur: reduce ? 4200 : 6400,
+      dur: dur,
       phase: Math.PI * 0.5,
       speed: 0.2,
-      amp: 0.22
+      amp: 0.20
     });
+    settleFrom = nowMs() + dur;
+    settleTo = settleFrom + SETTLE_MS;
     drone(gx, gy);
   }
 
@@ -888,17 +897,39 @@
   /* ------------------------------------------------------------------ *
    *  主循环
    * ------------------------------------------------------------------ */
-  var lastT = 0, slowCount = 0, raf = 0;
+  var lastT = 0, lastDt = 16, slowCount = 0, raf = 0;
 
   function frame(now) {
     raf = window.requestAnimationFrame(frame);
     var dt = now - lastT;
+    var prevT = lastT;
     lastT = now;
+    /* 标签页被挂起 / 主线程久卡之后回来：驻波寿命与回稳窗口都按真实时间计，
+       可能整段被跳过；补开一个回稳窗口，免得余波长时间留在水面上。
+       （lastT / settleTo 的初值 0 也是守卫：首帧即使 dt 很大也不会误开窗） */
+    var stalled = dt > 800 && lastDt < 300;
+    lastDt = dt;
+    if (stalled && (sources.length || settleTo > prevT)) {
+      var settleAt = now;
+      if (sources.length && sources[0].t0 + sources[0].dur > settleAt) {
+        settleAt = sources[0].t0 + sources[0].dur;
+      }
+      settleFrom = settleAt;
+      settleTo = settleAt + SETTLE_MS;
+    }
     if (dt > 46) {
       slowCount++;
       if (slowCount > 30 && subSteps > 1) { subSteps = 1; slowCount = 0; }
     } else if (slowCount > 0) {
       slowCount--;
+    }
+
+    /* 驻波结束后的回稳：短暂而平滑的额外阻尼，把余波送回静水，
+       而不是让落点继续像声源一样往外冒波 */
+    var settleF = 1;
+    if (now > settleFrom && now < settleTo) {
+      var su = (now - settleFrom) / SETTLE_MS;
+      settleF = 1 - (0.02 * (1 - su) + 0.002 * su);
     }
 
     for (var s = 0; s < subSteps; s++) {
@@ -911,7 +942,7 @@
         src.phase += src.speed;
         excite(src.gx, src.gy, Math.sin(src.phase) * env, 4.0);
       }
-      step();
+      step(settleF);
     }
     diffuse(SMOOTH);
     for (var m = sources.length - 1; m >= 0; m--) {
