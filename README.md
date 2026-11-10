@@ -4,6 +4,8 @@
 >
 > 于是有了这间屋子。十二件展品，跨交互、生成艺术、声音、文字与装置。全部离线，双击即开，不需要网络。
 
+**在线浏览：<https://curiosity.raricy.com>**（部署说明见 [DEPLOY.md](DEPLOY.md)）
+
 ![奇珍室 · 展品一览](_assets/shots/collection_sheet.png)
 
 ---
