@@ -6,3 +6,7 @@ Thumbs.db
 # 临时文件
 *.tmp
 *.log
+
+# 本地验收 / 调试产物（含本机路径，不提交）
+_assets/audit_report.json
+_assets/_debug/
