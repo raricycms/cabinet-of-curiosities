@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>不存在的图书馆 · 奇珍室 N°04</title>
+<style>
+:root{
+  --ink-950:#080a0f; --ink-900:#0d1119; --ink-800:#141a24; --ink-700:#1e2633;
+  --line:#2a3442; --paper:#efe8da; --text:#e6e2d8; --text-dim:#98a1ac;
+  --cyan:#6fb3a8; --amber:#d9a05b; --verm:#c05b4d; --lilac:#9a8fb8;
+  --serif:"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif;
+  --sans:"Noto Sans SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  --mono:"Cascadia Mono","Consolas","SFMono-Regular",monospace;
+  --kai:"KaiTi","STKaiti","Kaiti SC","FangSong",var(--serif);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --spine-h:142px;
+  --paper-ink:#241d16; --paper-dim:#6f604e; --paper-line:rgba(120,96,70,.22);
+  --stamp:#b0453a;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100dvh;color:var(--text);font-family:var(--sans);
+  font-size:15px;line-height:1.6;overflow-x:hidden;
+  background:
+    radial-gradient(1100px 480px at 50% -6%, rgba(217,160,91,.06), transparent 62%),
+    radial-gradient(900px 520px at 50% 108%, rgba(0,0,0,.55), transparent 62%),
+    var(--ink-900);
+}
+body.locked{overflow:hidden}
+::selection{background:rgba(217,160,91,.28);color:var(--paper)}
+button{font:inherit;color:inherit}
+a{color:inherit}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;
+  padding:10px clamp(16px,3vw,32px);
+  background:linear-gradient(180deg,rgba(8,10,15,.97) 0%,rgba(8,10,15,.74) 64%,rgba(8,10,15,0) 100%);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}.back{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--text-dim);
+  text-decoration:none;padding:7px 2px;transition:color .2s var(--ease);white-space:nowrap;
+}
+.back:hover{color:var(--amber)}
+.brand{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-family:var(--serif);font-size:12.5px;letter-spacing:.3em;
+  color:var(--text-dim);opacity:.62;white-space:nowrap;pointer-events:none;
+}
+.rebuild{
+  margin-left:auto;flex:0 0 auto;
+  font-family:var(--sans);font-size:12px;letter-spacing:.1em;color:var(--text);
+  background:transparent;border:1px solid var(--line);border-radius:2px;
+  padding:8px 14px;cursor:pointer;white-space:nowrap;
+  transition:border-color .22s var(--ease),color .22s var(--ease),background .22s var(--ease);
+}
+.rebuild:hover{border-color:rgba(217,160,91,.5);color:var(--amber);background:rgba(217,160,91,.05)}
+.rebuild:active{transform:translateY(1px)}
+.rebuild .g{font-family:var(--mono);margin-right:7px;opacity:.75;font-size:13px}
+
+/* ---------- 版心 ---------- */
+.stage{
+  position:relative;z-index:1;max-width:1200px;margin:0 auto;
+  padding:8px clamp(16px,3.2vw,40px) 76px;
+}
+.intro{max-width:660px;margin:6px auto 16px;text-align:center}
+.eyebrow{
+  margin:0 0 9px;font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;
+  color:var(--amber);opacity:.78;
+}
+h1{
+  margin:0 0 9px;font-family:var(--serif);font-weight:600;
+  font-size:clamp(26px,3.6vw,38px);letter-spacing:.07em;line-height:1.2;color:var(--paper);
+}
+.lede{margin:0;font-size:14.5px;line-height:1.8;color:var(--text-dim)}
+.lede em{font-style:normal;color:var(--paper)}
+.stats{
+  margin:11px 0 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;
+  color:var(--text-dim);opacity:.62;
+}
+
+/* ---------- 书架 ---------- */
+.shelves{
+  width:100%;max-width:770px;margin:0 auto;display:flex;flex-direction:column;gap:19px;
+  transition:opacity .22s var(--ease);
+}
+.shelves.fade{opacity:.22}
+.shelf{position:relative}
+.shelf-head{
+  display:flex;align-items:center;gap:11px;margin:0 3px 6px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--text-dim);opacity:.5;
+}
+.shelf-head .rule{flex:1;height:1px;background:var(--line)}
+.shelf-head .yr{letter-spacing:.14em}
+.shelf-body{
+  position:relative;overflow-x:auto;overflow-y:hidden;padding:0 14px;
+  border:1px solid #1a1f27;border-bottom:0;border-radius:2px 2px 0 0;
+  background:
+    radial-gradient(150% 72% at 50% 116%, rgba(217,160,91,.10), transparent 62%),
+    linear-gradient(180deg,#06070a 0%,#0a0b11 46%,#0b0a09 100%);
+  box-shadow:inset 0 20px 32px -18px #000, inset 0 -8px 20px -10px rgba(0,0,0,.92);
+  scrollbar-width:thin;scrollbar-color:rgba(217,160,91,.2) transparent;
+}
+.shelf-body::-webkit-scrollbar{height:5px}
+.shelf-body::-webkit-scrollbar-track{background:transparent}
+.shelf-body::-webkit-scrollbar-thumb{background:rgba(217,160,91,.2);border-radius:3px}
+.spines{
+  display:flex;align-items:flex-end;justify-content:center;gap:6px;
+  box-sizing:content-box;height:var(--spine-h);padding:16px 6px 0;
+}
+.plank{
+  height:13px;margin:0 -1px;border-top:1px solid #5b4027;border-radius:0 0 3px 3px;
+  background:linear-gradient(180deg,#4a3521 0%,#2e2013 44%,#191109 100%);
+  box-shadow:0 16px 26px -12px rgba(0,0,0,.95), inset 0 1px 0 rgba(217,160,91,.2);
+}
+.plank::after{content:"";display:block;height:1px;margin-top:2px;background:rgba(217,160,91,.1)}
+
+/* 书脊 */
+.spine{
+  position:relative;flex:0 0 auto;width:var(--w,44px);
+  height:calc(var(--hf,96) * var(--spine-h) / 100);
+  padding:6px 0;border:0;border-radius:2px 2px 0 0;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.46) 0%,rgba(0,0,0,.14) 5%,rgba(255,255,255,.075) 16%,
+      rgba(255,255,255,.03) 32%,rgba(0,0,0,.02) 54%,rgba(0,0,0,.12) 82%,rgba(0,0,0,.44) 100%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.016) 0 1px,transparent 1px 3px),
+    linear-gradient(180deg,
+      hsl(var(--sh) var(--ss) calc(var(--sl) + 8%)),
+      hsl(var(--sh) var(--ss) var(--sl)) 56%,
+      hsl(var(--sh) var(--ss) calc(var(--sl) - 7%)));
+  color:rgba(239,232,218,var(--fg,.8));
+  font-family:var(--serif);font-size:var(--fs,12px);letter-spacing:.08em;line-height:1;
+  writing-mode:vertical-rl;text-orientation:upright;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;overflow:hidden;
+  box-shadow:inset 0 2px 0 rgba(0,0,0,.32),inset 1px 0 0 rgba(255,255,255,.06),
+    inset -1px 0 0 rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.55);
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease),color .2s var(--ease),filter .3s var(--ease);
+}
+.spine::before{
+  content:"";position:absolute;left:0;right:0;top:8%;height:1px;
+  background:var(--bandc,rgba(239,232,218,.26));
+}
+.spine::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:5px;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.34));
+}
+.spine--absent::after{
+  content:"";left:2px;right:2px;bottom:9%;height:2px;
+  background:rgba(192,91,77,.5);box-shadow:0 0 8px rgba(192,91,77,.35);
+}
+.spine-t{max-height:100%;overflow:hidden}
+.spine:hover,.spine:focus-visible{
+  transform:translateY(-6px);z-index:6;outline:none;
+  color:rgba(248,243,232,1);filter:brightness(1.07);
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.12),0 10px 18px -8px rgba(0,0,0,.95),0 0 0 1px rgba(217,160,91,.24);
+}
+.spine.is-out{
+  transform:translateY(-13px);color:rgba(248,243,232,1);
+  box-shadow:0 16px 26px -12px rgba(0,0,0,.95),0 0 0 1px rgba(217,160,91,.38);
+}
+.spine.is-out::before{background:rgba(217,160,91,.5)}
+
+.hint{
+  margin:0 auto;text-align:center;min-width:0;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--text-dim);opacity:.48;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hint .hx{opacity:.9}
+
+/* ---------- 悬浮提示 ---------- */
+.tip{
+  position:fixed;left:0;top:0;z-index:70;pointer-events:none;max-width:300px;
+  padding:9px 12px 10px;border:1px solid rgba(90,72,52,.45);border-radius:1px;
+  background:linear-gradient(158deg,#f5f0e5 0%,#ebe3d3 100%);
+  box-shadow:0 24px 40px -18px rgba(0,0,0,.95),0 2px 8px rgba(0,0,0,.5);
+  color:#241d16;
+  opacity:0;transform:translateY(5px);transition:opacity .16s var(--ease),transform .16s var(--ease);
+}
+.tip.show{opacity:1;transform:none}
+.tip b{display:block;font-family:var(--serif);font-weight:600;font-size:14px;line-height:1.45;color:#1f1912}
+.tip span{display:block;margin-top:4px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#7a6a56}
+.tip i{display:block;margin-top:6px;padding-top:5px;border-top:1px solid rgba(120,96,70,.2);
+  font-style:normal;font-size:10.5px;letter-spacing:.08em;color:#a8402f}
+
+/* ---------- 卡片 ---------- */
+.reader{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:clamp(0px,3vw,40px)}
+.reader[hidden]{display:none}
+.backdrop{
+  position:absolute;inset:0;background:rgba(5,6,9,.76);
+  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
+  opacity:0;transition:opacity .3s var(--ease);
+}
+.reader.open .backdrop{opacity:1}
+.card{
+  position:relative;width:min(680px,100%);max-height:min(86dvh,860px);overflow-y:auto;
+  overscroll-behavior:contain;padding:clamp(22px,3.6vw,38px) clamp(20px,3.6vw,38px) clamp(24px,3vw,34px);
+  border-radius:2px;color:var(--paper-ink);
+  background:
+    repeating-linear-gradient(0deg,rgba(120,96,70,.028) 0 1px,transparent 1px 3px),
+    linear-gradient(158deg,#f5f0e5 0%,#ece5d6 52%,#e6ddcc 100%);
+  box-shadow:0 44px 84px -32px rgba(0,0,0,.92),0 0 0 1px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.65);
+  opacity:0;transform:translateY(12px) scale(.994);
+  transition:opacity .28s var(--ease),transform .38s var(--ease);
+  scrollbar-width:thin;scrollbar-color:rgba(120,96,70,.35) transparent;
+}
+.reader.open .card{opacity:1;transform:none}
+.card:focus{outline:none}
+.card::-webkit-scrollbar{width:8px}
+.card::-webkit-scrollbar-thumb{background:rgba(120,96,70,.32);border-radius:4px}
+.card-close{
+  position:absolute;top:10px;right:10px;width:34px;height:34px;display:grid;place-items:center;
+  border:0;background:transparent;cursor:pointer;border-radius:50%;
+  font-family:var(--mono);font-size:18px;line-height:1;color:#8b7a64;
+  transition:color .2s var(--ease),background .2s var(--ease);
+}
+.card-close:hover{color:var(--paper-ink);background:rgba(120,96,70,.12)}
+.card-close:focus-visible{outline:1px solid var(--paper-ink);outline-offset:2px}
+
+.c-top{
+  display:flex;align-items:center;gap:9px;margin:0 34px 14px 0;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:#94826a;
+}
+.c-top .dot{width:3px;height:3px;border-radius:50%;background:#b8a68c;flex:0 0 auto}
+.c-title{
+  margin:0 0 8px;font-family:var(--serif);font-weight:600;
+  font-size:clamp(23px,3.2vw,32px);line-height:1.34;letter-spacing:.025em;color:#201a13;
+  word-break:break-word;
+}
+.c-author{margin:0;font-family:var(--serif);font-size:14.5px;letter-spacing:.03em;color:#5d5142}
+.c-author .sep{margin:0 8px;color:#a3917145;color:#a39171}
+
+.c-meta{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px 16px;
+  margin:17px 0 0;padding:13px 0 14px;
+  border-top:1px solid var(--paper-line);border-bottom:1px solid var(--paper-line);
+}
+.c-meta .k{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:#9a876d}
+.c-meta .v{margin-top:4px;font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:#33291f;line-height:1.5}
+
+.c-label{
+  margin:20px 0 8px;font-family:var(--sans);font-size:10px;letter-spacing:.3em;color:#8d7a62;
+}
+.c-blurb{margin:0;font-size:14.5px;line-height:1.95;color:#3a3028;letter-spacing:.01em}
+.c-excerpt{
+  margin:0;padding:1px 0 1px 16px;border-left:2px solid rgba(176,69,58,.4);
+  font-family:var(--kai);font-size:17px;line-height:2.02;color:#2c241d;letter-spacing:.02em;
+}
+
+/* 借阅卡 */
+.loan{
+  position:relative;margin:22px 0 0;padding:14px 16px 18px;
+  background:#f0e7d3;border:1px solid rgba(120,96,70,.32);
+  box-shadow:inset 0 0 0 3px #f0e7d3,inset 0 0 0 4px rgba(120,96,70,.16);
+}
+.loan-head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding-right:78px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.24em;color:#9a876d;margin-bottom:9px;
+}
+.loan-head .no{letter-spacing:.14em;opacity:.85}
+.lrow,.lhead{display:grid;grid-template-columns:82px minmax(0,1fr) 82px 66px;align-items:center;height:25px}
+.lhead{height:20px;font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;color:#a89479}
+.lrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.02em;color:#4a3f31;
+  border-bottom:1px solid rgba(176,69,58,.13);
+}
+.lrow:nth-child(odd){background:rgba(176,69,58,.028)}
+.lrow .c2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px}
+.lrow .c3{color:#7c6b55}
+.lrow .c4{font-size:10px;letter-spacing:.06em}
+.st-ok{color:#4d6a54}
+.st-late{color:#a8402f}
+.st-out{color:#8a651f}
+.stamp{
+  position:absolute;right:14px;top:9px;transform:rotate(-7deg);
+  padding:3px 9px 3px 11px;border:2px solid rgba(176,69,58,.5);border-radius:2px;
+  box-shadow:inset 0 0 0 2px #f0e7d3,inset 0 0 0 3px rgba(176,69,58,.28);
+  font-family:var(--serif);font-size:12px;letter-spacing:.24em;color:rgba(176,69,58,.66);
+  pointer-events:none;mix-blend-mode:multiply;
+}
+.egg-note{
+  margin:13px 0 0;padding-top:11px;border-top:1px dashed rgba(176,69,58,.26);
+  font-family:var(--serif);font-size:13px;line-height:1.85;color:#7c5a4a;letter-spacing:.02em;
+}
+.c-actions{
+  position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;gap:10px;
+  margin:22px 0 0;padding:12px 0 8px;
+  background:
+    repeating-linear-gradient(0deg,rgba(120,96,70,.028) 0 1px,transparent 1px 3px),
+    linear-gradient(180deg,#eee6d7 0%,#e7decc 100%);
+  border-top:1px solid rgba(120,96,70,.14);
+  box-shadow:0 -16px 20px -16px rgba(60,45,30,.4);
+}
+.btn{
+  padding:10px 18px;border-radius:2px;cursor:pointer;border:1px solid transparent;
+  font-family:var(--sans);font-size:13px;letter-spacing:.08em;
+  transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease),transform .1s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:#241d16;color:#f3ede1;border-color:#241d16}
+.btn-primary:hover{background:#3b2f23}
+.btn-ghost{background:transparent;color:#6f604e;border-color:rgba(120,96,70,.38)}
+.btn-ghost:hover{border-color:#241d16;color:#241d16}
+.btn:focus-visible{outline:1px solid #241d16;outline-offset:2px}
+
+/* ---------- 底栏 / 提示条 ---------- */
+.botbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:center;gap:14px;
+  padding:9px clamp(16px,3vw,30px) 11px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--text-dim);
+  background:linear-gradient(180deg,rgba(8,10,15,0) 0%,rgba(8,10,15,.9) 46%,var(--ink-950) 100%);
+}
+.sound{
+  flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
+  padding:5px 9px;border:1px solid var(--line);border-radius:2px;background:transparent;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--text-dim);
+  cursor:pointer;transition:color .2s,border-color .2s;
+}
+.sound:hover{color:var(--paper);border-color:#3a4658}
+.sound[aria-pressed="true"]{color:var(--amber);border-color:rgba(217,160,91,.4)}
+.seed{opacity:.55;white-space:nowrap}
+.pageno{margin-left:auto;white-space:nowrap;letter-spacing:.16em;color:var(--text-dim);opacity:.8}
+.pageno .n{color:var(--amber);opacity:.85}
+
+.toast{
+  position:fixed;left:50%;bottom:72px;z-index:120;transform:translate(-50%,10px);
+  padding:10px 18px;border:1px solid #2c3644;border-radius:2px;background:#0c1017;
+  font-size:12.5px;letter-spacing:.05em;color:var(--paper);opacity:0;pointer-events:none;
+  box-shadow:0 22px 40px -22px #000;transition:opacity .24s var(--ease),transform .24s var(--ease);
+  max-width:calc(100vw - 40px);text-align:center;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:820px){
+  .brand{display:none}
+  .intro{margin-bottom:12px}
+  .shelves{max-width:none}
+  .spines{justify-content:flex-start}
+}
+@media (max-width:560px){
+  :root{--spine-h:118px}
+  .stage{padding-bottom:62px}
+  .shelves{gap:15px}
+  .lede{font-size:14px}
+  .stats{font-size:10px;letter-spacing:.14em}
+  .seed{display:none}
+  .shelf-head{font-size:9px;letter-spacing:.16em}
+  .hint{font-size:9px;letter-spacing:.1em}
+  .hint .hx{display:none}
+  .botbar{gap:10px}
+  .pageno{font-size:9px;letter-spacing:.12em}
+  .reader{padding:0}
+  .card{width:100%;height:100%;max-height:100dvh;max-width:none;border-radius:0}
+  .c-meta{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lrow,.lhead{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"d1 st" "c2 c3";height:auto;padding:6px 0;row-gap:2px}
+  .lhead{display:none}
+  .lrow .c1{grid-area:d1;font-size:10.5px}
+  .lrow .c4{grid-area:st;justify-self:end}
+  .lrow .c2{grid-area:c2;padding-right:0;color:#5d5142}
+  .lrow .c3{grid-area:c3;justify-self:end;font-size:10px}
+  .lrow .c3::before{content:"归还 ";opacity:.65}
+  .c-excerpt{font-size:16px}
+  .toast{bottom:64px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+  .spine:hover,.spine:focus-visible{transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back" href="../00_从这里开始.html">← 奇珍室</a>
+  <div class="brand">不存在的图书馆</div>
+  <button class="rebuild" id="rebuildBtn" type="button"><span class="g">↻</span>重构图书馆</button>
+</header>
+
+<main class="stage">
+  <section class="intro">
+    <p class="eyebrow">奇珍室 · 展品 N°04</p>
+    <h1>不存在的图书馆</h1>
+    <p class="lede">这座图书馆只收藏<em>从未被写出的书</em>。抽出一本书脊，它会展开成一张卡片。</p>
+    <p class="stats" id="stats">36 册　·　3 架</p>
+  </section>
+
+  <section class="shelves" id="shelves" aria-label="书架"></section>
+</main>
+
+<footer class="botbar">
+  <button class="sound" id="soundBtn" type="button" aria-pressed="false" aria-label="开启声音">声 关</button>
+  <span class="seed" id="seedline">SEED</span>
+  <span class="hint">点击书脊抽出<span class="hx">　·　按 Esc 放回</span><span class="hx">　·　「重构图书馆」换一批</span></span>
+  <span class="pageno"><span class="n">N°04</span> · 不存在的图书馆</span>
+</footer>
+
+<div class="reader" id="reader" hidden>
+  <div class="backdrop" data-close></div>
+  <article class="card" id="card" role="dialog" aria-modal="true" aria-label="书籍卡片" tabindex="-1"></article>
+</div>
+
+<div class="tip" id="tip" aria-hidden="true"><b></b><span></span><i></i></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sr" id="announce" aria-live="polite"></div>
+
+<script>
+/* ==== LIBRARY-CONTENT-ENGINE :BEGIN ==== */
+/* 纯内容引擎：无 DOM、无副作用。种子相同则书库相同。 */
+var LibraryEngine = (function () {
+  'use strict';
+
+  /* ---------- 种子化随机 ---------- */
+  function hashSeed(str) {
+    var h = 1779033703 ^ str.length;
+    for (var i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return function () {
+      h = Math.imul(h ^ (h >>> 16), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      return (h ^= h >>> 16) >>> 0;
+    };
+  }
+
+  function makeRng(seedStr) {
+    var a = hashSeed(String(seedStr))();
+    function next() {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+    return {
+      f: next,
+      int: function (min, max) { return min + Math.floor(next() * (max - min + 1)); },
+      pick: function (arr) { return arr[Math.floor(next() * arr.length)]; },
+      chance: function (p) { return next() < p; },
+      shuffled: function (arr) {
+        var b = arr.slice();
+        for (var i = b.length - 1; i > 0; i--) {
+          var j = Math.floor(next() * (i + 1));
+          var t = b[i]; b[i] = b[j]; b[j] = t;
+        }
+        return b;
+      },
+      weighted: function (pairs) {
+        var total = 0, i;
+        for (i = 0; i < pairs.length; i++) total += pairs[i][1];
+        var r = next() * total;
+        for (i = 0; i < pairs.length; i++) { r -= pairs[i][1]; if (r <= 0) return pairs[i][0]; }
+        return pairs[pairs.length - 1][0];
+      }
+    };
+  }
+
+  /* ---------- 语料：姓名 / 国籍 / 出版者 / 借阅人 ---------- */
+  var SURNAMES = ['沈', '陆', '顾', '裴', '温', '岑', '苏', '谢', '徐', '曾', '程',
+    '谭', '罗', '简', '钟', '黎', '柏', '商', '郁', '闻', '祝', '阮'];
+  var GIVEN_1 = ['迟', '舟', '岚', '叙', '桑', '旸', '珩', '淮', '昀', '珂',
+    '隽', '澈', '肃', '洛', '棣', '芸', '钦', '湛', '屿', '澜'];
+  var GIVEN_2 = ['怀山', '知白', '望之', '南屏', '见素', '允之', '半塘', '秋舫',
+    '慕山', '敬之', '觉非', '无咎', '子安', '少川', '一苇', '守愚', '听澜', '行止'];
+
+  var NATIONS = [['中国', 74], ['日本', 7], ['韩国', 4], ['越南', 4],
+    ['马来西亚', 4], ['新加坡', 3], ['无国籍', 4]];
+
+  var PRESS = {
+    old: ['北窗书局', '映雪书庄', '南屏印社', '灰蓝书局', '晚钟书庄', '冷杉书房', '槐荫书室'],
+    mid: ['白鲸文库', '灯下书坊', '石阶出版社', '旧港出版社', '无名氏印社', '小满书店'],
+    now: ['苔井出版社', '半页文库', '长风出版', '纸月出版社', '海图社', '第十二层出版社']
+  };
+
+  var BORROWERS = ['陈默', '林知远', '周慎', '沈瑀', '黄樵', '吴观澜', '李慈', '郑栖',
+    '何墨', '白苓', '顾晚', '阮清', '洪渠', '徐隐', '宋栖', '石泠', '麦青', '田禾'];
+
+  /* ---------- 语料：书名（10 类句式，槽位经过语义配对） ---------- */
+  var T_ADJ = ['潮湿', '安静', '褪色', '多余', '陌生', '半透明', '无人认领',
+    '被遗忘', '未完成', '倾斜', '短暂', '沉重'];
+  var T_OBJ = ['钟楼', '地图', '庭院', '楼梯', '灯塔', '温室', '河流', '月台',
+    '花园', '旅馆', '走廊', '水井'];
+  var T2 = [
+    ['收集', ['雨水', '旧信', '方言', '影子', '脚印']],
+    ['修补', ['屋顶', '时钟', '地图', '影子', '瓷器']],
+    ['命名', ['石头', '星星', '云', '旧路']],
+    ['测量', ['雨量', '时间', '夜晚的深度', '风']],
+    ['抄写', ['账目', '碑文', '潮汐表', '家谱']],
+    ['看守', ['灯塔', '果园', '遗址', '钟楼']],
+    ['翻译', ['雨声', '方言', '沉默', '鸟叫']],
+    ['折叠', ['地图', '夜色', '时间', '旧衣服']],
+    ['埋葬', ['旧信', '名字', '钟表', '乐器']],
+    ['梦见', ['水', '雪', '一匹马', '一列火车']]
+  ];
+  var T3_PLACE = ['青崖', '白水', '黑石', '寒山', '沧浪', '落雁', '平湖', '望川', '南塘', '北岭'];
+  var T3_THING = ['桥梁', '盐井', '窑址', '渡口', '碑刻', '驿站', '渠系', '祠庙', '矿脉', '堤防'];
+  var T4_A = ['雾', '盐', '火', '铁', '潮汐', '蜂蜜', '雪', '丝绸', '石头', '镜子', '雨', '茶', '尘', '光'];
+  var T4_B = ['通信', '笔记', '手稿', '札记', '讲稿', '观察', '报告', '回忆', '词典', '年表'];
+  var T5 = [['玻璃', '算术'], ['盐', '夜晚'], ['丝绸', '几何'], ['雪', '钟表'], ['火', '记忆'],
+    ['河流', '语法'], ['石头', '时间'], ['纸', '战争'], ['光', '旧事'], ['铁', '宗教'],
+    ['雾', '秩序'], ['木头', '沉默'], ['潮汐', '法律'], ['蜂蜜', '刑罚'], ['灰尘', '礼节']];
+  var T6_OBJ = ['雪', '雨', '雾', '河', '风', '霜', '潮水', '火', '麦子', '灯'];
+  var T6_MONTH = [['三', '雨'], ['四', '雾'], ['五', '河'], ['七', '风'], ['九', '信'],
+    ['十一', '雪'], ['十二', '灯']];
+  var T7_P = ['阁楼的', '地下室的', '海边的', '庭院的', '屋顶的', '车站的', '山谷的', '仓库的'];
+  var T7_D = ['博物学', '算术', '地理', '音韵学', '植物志', '编年史', '气象学', '地图学',
+    '伦理学', '昆虫志'];
+  var T8_NUM = ['七', '九', '十一', '十三', '十七', '二十三', '三十七', '四十九'];
+  var T8_UNIT = [['封', '未寄出的信'], ['级', '台阶'], ['只', '纸鸟'], ['把', '钥匙'],
+    ['扇', '没有玻璃的窗'], ['盏', '不亮的灯'], ['本', '空白账簿'], ['段', '楼梯'],
+    ['页', '日记']];
+  var T9_PAIRS = [['河流', '田野笔记'], ['盐', '博物志'], ['铁', '编年史'], ['雾', '札记'],
+    ['手艺', '口述史'], ['方言', '词典'], ['石匠', '口述史'], ['渡口', '图谱'],
+    ['雪', '札记'], ['渡船', '田野笔记']];
+  var T10 = ['缓坡', '残页', '静物', '潮位', '空址', '雪线', '灯芯', '潮痕',
+    '西窗', '长夏', '旧港', '微尘', '深夜', '慢雨', '薄霜', '空转'];
+
+  /* 书名句式 → 偏好体裁（保证书名与简介体裁不打架） */
+  var T4_GENRE = {
+    '通信': ['书信体小说'], '笔记': ['散文集', '随笔集', '田野笔记'],
+    '手稿': ['散文集', '文献汇编'], '札记': ['随笔集', '田野笔记'],
+    '讲稿': ['讲稿', '随笔集'], '观察': ['田野笔记', '博物志'],
+    '报告': ['纪事', '田野笔记'], '回忆': ['回忆录'],
+    '词典': ['词典体小说'], '年表': ['纪事']
+  };
+  var T9_GENRE = {
+    '田野笔记': '田野笔记', '博物志': '博物志', '编年史': '纪事', '口述史': '口述史',
+    '词典': '词典体小说', '图谱': '图录', '札记': '札记'
+  };
+
+  var TITLE_GENS = [
+    { k: 'adj', w: 17, genres: ['长篇小说', '中篇小说', '短篇集', '诗集'],
+      make: function (r) { return r.pick(T_ADJ) + '的' + r.pick(T_OBJ); } },
+    { k: 'doer', w: 15, genres: ['长篇小说', '中篇小说', '短篇集', '书信体小说'],
+      make: function (r) { var g = r.pick(T2); return g[0] + r.pick(g[1]) + '的人'; } },
+    { k: 'kao', w: 11, genres: ['田野笔记', '纪事', '图录', '博物志'],
+      make: function (r) { return r.pick(T3_PLACE) + r.pick(T3_THING) + '考'; } },
+    { k: 'about', w: 12, genres: ['散文集', '随笔集', '札记'],
+      make: function (r) {
+        var b = r.pick(T4_B);
+        return { t: '关于' + r.pick(T4_A) + '的' + b, genres: T4_GENRE[b] };
+      } },
+    { k: 'and', w: 9, genres: ['长篇小说', '散文集', '随笔集'],
+      make: function (r) { var p = r.pick(T5); return p[0] + '与' + p[1]; } },
+    { k: 'year', w: 10, genres: ['诗集', '散文集', '短篇集', '中篇小说'],
+      make: function (r, year) {
+        var y = year - r.int(0, 26);
+        if (y < 1830) return null;
+        return y + '年的' + r.pick(T6_OBJ);
+      } },
+    { k: 'month', w: 6, genres: ['诗集', '散文集', '随笔集'],
+      make: function (r) { var p = r.pick(T6_MONTH); return p[0] + '月的' + p[1]; } },
+    { k: 'place', w: 11, genres: ['散文集', '随笔集', '田野笔记', '博物志', '图录'],
+      make: function (r) { return r.pick(T7_P) + r.pick(T7_D); } },
+    { k: 'count', w: 7, genres: ['短篇集', '诗集', '书信体小说', '文献汇编'],
+      make: function (r) { var u = r.pick(T8_UNIT); return r.pick(T8_NUM) + u[0] + u[1]; } },
+    { k: 'colon', w: 6, genres: ['田野笔记', '随笔集'],
+      make: function (r) {
+        var p = r.pick(T9_PAIRS);
+        return { t: p[0] + '：一部' + p[1], genres: [T9_GENRE[p[1]]] };
+      } },
+    { k: 'short', w: 8, genres: ['诗集', '中篇小说', '短篇集'],
+      make: function (r) { return r.pick(T10); } }
+  ];
+
+  /* ---------- 语料：简介（6 类句式，信息量为体裁 / 主题 / 评价） ---------- */
+  var GENRE_UNIT = {
+    '长篇小说': '章', '中篇小说': '章', '短篇集': '篇', '散文集': '篇', '随笔集': '则',
+    '诗集': '首', '田野笔记': '则', '书信体小说': '封', '纪事': '则', '图录': '幅',
+    '回忆录': '章', '词典体小说': '条', '博物志': '则', '口述史': '篇',
+    '讲稿': '篇', '札记': '则', '文献汇编': '卷'
+  };
+  var B_GENRE = ['长篇小说', '中篇小说', '短篇集', '散文集', '随笔集', '诗集',
+    '田野笔记', '书信体小说', '纪事', '图录', '回忆录', '词典体小说',
+    '博物志', '口述史', '讲稿', '札记', '文献汇编'];
+  var B_THEME = ['记忆的保存与丢失', '迁徙中的人', '手艺人的晚景', '一座城的水文',
+    '名字的流变', '旧物的去向', '乡村时间的流速', '失语与沉默', '等待的形状',
+    '一座山的草木', '盐与生计', '方言的消亡', '夜晚的秩序', '被拆掉的老屋'];
+  var B_METHOD = ['白描', '冷峻的短句', '近乎档案的笔法', '反复的回环', '克制的对话',
+    '第一人称的旁白', '蒙太奇式的段落', '缓慢的长句', '大段留白'];
+  var B_OBJECT = ['一条干涸的河', '一座废弃的剧场', '一间空屋', '一个家族的三十年',
+    '一群老手艺人的余生', '一列深夜的慢车', '一个消失的渡口', '一座山的四季',
+    '一条街的兴衰', '一栋正在拆的楼'];
+  var B_OUTCOME = ['只印了八百册，却在二十年后被重新发现',
+    '再版三次，作者始终没有回应',
+    '被当时的评论界忽略，直到作者去世才有人重读',
+    '获过一次小奖，此后绝版',
+    '从未再版，只余图书馆的一张编目卡',
+    '卖得不好，却意外地在地质队里流行了几年'];
+  var B_VERDICT = ['被认为是作者最克制的一部', '常被误读为自传，作者否认过七次',
+    '至今没有完整的译本', '是作者唯一一次写到自己',
+    '评论者至今说不清它算哪种文体'];
+  var B_CLAIM = ['一次缓慢的告别', '一种不肯说破的挽留', '对旧日的一次清点',
+    '一部没有结论的笔记', '一次迟到的辩解'];
+  var B_AS = ['一份病历', '一本账簿', '一张地图', '一座遗址', '一封长信', '一份气象记录'];
+  var B_REPEAT = ['拆解', '绕开', '追问', '清点', '推迟'];
+  var B_LIST = ['长长的清单', '语焉不详的记录', '写给自己的备忘', '临时的交代', '未整理的草稿'];
+  var B_FORM = ['一次清算', '一份证词', '一部编年史', '一场清点', '一份病历'];
+
+  var BLURB_GENS = [
+    { k: 'b1', w: 20, make: function (r, genre) {
+        var lead = r.chance(0.5)
+          ? '一部关于' + r.pick(B_THEME) + '的' + genre
+          : '一部以' + r.pick(B_THEME) + '为主题的' + genre;
+        return lead + '。作者以' + r.pick(B_METHOD) + '写' + r.pick(B_OBJECT) +
+          '，出版后' + r.pick(B_OUTCOME) + '。';
+      } },
+    { k: 'b2', w: 17, make: function (r, genre) {
+        return genre + '。全书以' + r.pick(B_METHOD) + '贯穿，讨论' + r.pick(B_THEME) +
+          '，' + r.pick(B_VERDICT) + '。';
+      } },
+    { k: 'b3', w: 13, ok: function (ctx) { return !!(ctx && ctx.late); },
+      make: function (r, genre) {
+        return '作者晚年的' + genre + '，' + r.pick(B_VERDICT) + '。全书没有注释，只有' +
+          r.pick(B_CLAIM) + '。';
+      } },
+    { k: 'b4', w: 16, make: function (r, genre) {
+        var unit = GENRE_UNIT[genre] || '篇';
+        return genre + '，共' + r.int(8, 40) + unit + '。作者把' + r.pick(B_OBJECT) + '当作' +
+          r.pick(B_AS) + '来写，' + r.pick(B_VERDICT) + '。';
+      } },
+    { k: 'b5', w: 15, make: function (r, genre) {
+        return '一部未完成的' + genre + '：' + r.pick(B_THEME) + '在书里被反复' +
+          r.pick(B_REPEAT) + '，直到最后一页也没有结论。';
+      } },
+    { k: 'b6', w: 18, make: function (r, genre) {
+        return genre + '。作者自称这不是一本书，只是一个' + r.pick(B_LIST) +
+          '；读者却发现，它把' + r.pick(B_THEME) + '写成了' + r.pick(B_FORM) + '。';
+      } }
+  ];
+
+  /* ---------- 语料：摘录（起 / 承 / 合，全部手工编写） ---------- */
+  var STARTS = [
+    { t: '那年冬天，父亲把最后一只钟拆开，零件摊在桌上，像一副没下完的残局。', tags: ['clock'] },
+    { t: '阁楼里没有窗，只有一只旧箱子和一堆没拆的信。', tags: ['room'] },
+    { t: '我在渡口住了三个月，每天只做一件事：数过河的人。', tags: ['river'] },
+    { t: '梅雨来得比往年早，墙上的水汽一天比一天厚，像有人在里面呼吸。', tags: ['house'] },
+    { t: '停电的那个晚上，整条街只剩下打字机的声音。', tags: ['room'] },
+    { t: '外祖父留下一把钥匙，却没说它能开哪扇门。', tags: ['key'] },
+    { t: '三月的一个下午，我第一次走进那间阅览室，管理员正在给一张空椅子掸灰。', tags: ['book'] },
+    { t: '河滩上的石头被水冲得很圆，我捡起一颗，又放了回去。', tags: ['river'] },
+    { t: '天亮之前，仓库里的灯还亮着，谁也没有去关。', tags: ['room'] },
+    { t: '邻居把旧书论斤卖掉，称完才想起里面夹着一张相片。', tags: ['book'] },
+    { t: '温室里只剩一株植物，它每年开花的时间都不一样。', tags: ['plant'] },
+    { t: '走廊尽头有一扇门，门上钉着一块牌子，牌子上没有字。', tags: ['door'] },
+    { t: '我数过这条街上的钟，一共七只，没有一只走得准。', tags: ['clock'] },
+    { t: '九月末的风把报纸吹到铁轨上，没有人去捡。', tags: ['train'] },
+    { t: '锅炉房很暖，工人们把午饭放在管道上，等它变软。', tags: ['work'] },
+    { t: '废弃的剧场里还有回声，只是没有人再往台上站。', tags: ['room'] },
+    { t: '那本账簿记到第七页就断了，最后一笔是：盐，四斤。', tags: ['book'] },
+    { t: '雨下了整整二十天，屋顶漏下来的水刚好落在一只铁桶里。', tags: ['house'] },
+    { t: '我第一次见到他时，他正把一封信拆开，又原样封上。', tags: ['letter'] },
+    { t: '山道很窄，两边的雪还没化，我们就靠着这一点白认路。', tags: ['road'] },
+    { t: '邮局的老周说，这封信已经等了三十年，收信人一直没来取。', tags: ['letter'] },
+    { t: '我把阅览室的窗擦了一遍，玻璃干净了，外面的雨就看得更清楚。', tags: ['room'] },
+    { t: '那年夏天河水退到最浅，露出半截石桥和一只船锚。', tags: ['river'] },
+    { t: '仓库的钥匙挂在门框上，谁都可以拿，却没有一把能开仓库的门。', tags: ['key'] },
+    { t: '她教我在信纸上留白，说空着的地方比写出来的更重。', tags: ['letter'] },
+    { t: '剧院的后台还留着上一位演员的台词，用铅笔写在墙皮上。', tags: ['room'] },
+    { t: '父亲在果园里种了七棵梨树，说八棵不吉利，七棵刚好。', tags: ['plant'] },
+    { t: '桥下的水声很响，我们说话都得凑近，后来干脆不说话。', tags: ['river'] },
+    { t: '冬天最冷的那几天，煤油灯的火苗会缩成一颗豆子。', tags: ['light'] },
+    { t: '山上的气象站只剩一个人，他每天发三次电报，收报的人早就调走了。', tags: ['work'] },
+    { t: '我在旧货市场买了一只没有指针的钟，摊主说这样最省心。', tags: ['clock'] },
+    { t: '每年清明，母亲都要把柜子里的旧衣服拿出来晒一遍，再放回去。', tags: ['house'] },
+    { t: '图书馆的编目员换过四个，卡片上的字迹却一直是同一种。', tags: ['book'] },
+    { t: '那年的雪下到膝盖，邮差把信送到门口就走了，没有进门。', tags: ['letter'] },
+    { t: '山坡上有一排坟，没有碑，只有几块压着石头的砖。', tags: ['road'] },
+    { t: '父亲一生只修钟，家里却没有一只钟是准的。', tags: ['clock'] },
+    { t: '河对岸的灯每晚十点灭，我们从没过去看过。', tags: ['river', 'light'] },
+    { t: '屋里的家具都搬空了，墙上留下一个个浅色的印子。', tags: ['house'] },
+    { t: '她说话很慢，一句话里常要停两次，像在等什么人接。', tags: ['person'] },
+    { t: '井水冬天是温的，夏天是凉的，这一点从没变过。', tags: ['house'] }
+  ];
+  var TURNS = [
+    { t: '“东西放久了会有自己的脾气，”他说，“你别急着修。”', tags: ['clock', 'person'] },
+    { t: '我把那串钥匙挂在门后，像挂起一串没有人认领的日期。', tags: ['key'] },
+    { t: '如果雨再下三天，河就会漫上来；如果雨停，我们就得走。', tags: ['river'] },
+    { t: '他不解释，只是把桌上的灰抹平，再重新写上字。', tags: ['work'] },
+    { t: '抄写到第七十页，我发现里面有一个名字，是我不认识的。', tags: ['book'] },
+    { t: '那本书的最后一页被撕掉了，撕口很整齐，像是有人特意留的。', tags: ['book'] },
+    { t: '母亲从不说“等”，她只说“到时候”。', tags: ['person'] },
+    { t: '我们约在钟楼下见面，谁也没有带表。', tags: ['clock'] },
+    { t: '有些东西不是丢了，是被放在另一个地方，等你想不起来的时候再出现。', tags: ['person'] },
+    { t: '我学会分辨三种雨声：落在瓦上的、落在铁皮上的、落在水里的。', tags: ['house'] },
+    { t: '灯芯剪得太短，火苗只剩一点，屋子里反而更亮。', tags: ['light'] },
+    { t: '他把地图折成很小的一块塞进袖口，说这样就不会走丢。', tags: ['road'] },
+    { t: '那些年我们搬家七次，每次都带走同一只箱子，从不打开。', tags: ['room'] },
+    { t: '记录本上写着“一切正常”，一连写了四个月，字迹一天比一天潦草。', tags: ['book', 'work'] },
+    { t: '沉默不是没有话，是话太多，只好一句一句往回咽。', tags: ['person'] },
+    { t: '她只借不还，管理员也从不催，好像那几本书本来就在她那里。', tags: ['book'] },
+    { t: '我问他为什么不走，他说，走了就得回来，回来就得解释。', tags: ['person'] },
+    { t: '铁轨尽头起了雾，车灯照过去，什么也没有照到。', tags: ['train'] },
+    { t: '他说，修不好也没关系，留下来看看它是怎么坏的。', tags: ['clock', 'work'] },
+    { t: '我把所有的信按日期排好，才发现中间缺了整整两年。', tags: ['letter'] },
+    { t: '那年冬天很干，河底的石头露出来，我们踩着一颗一颗过河。', tags: ['river'] },
+    { t: '她从不写日期，只用“那天”“后来”“再后来”。', tags: ['letter'] },
+    { t: '我数了三天，才数清屋顶一共有多少片瓦。', tags: ['house'] },
+    { t: '灯灭以后，屋子里的东西才开始显出轮廓。', tags: ['light'] },
+    { t: '我们把它放在桌上，谁也不去碰，好像一碰就会回到从前。', tags: ['room'] },
+    { t: '他在每张纸上都写同一个字，写完就烧掉，烧完再写。', tags: ['work'] },
+    { t: '河面结冰的那天，有人在冰上走了一个来回，没有留下名字。', tags: ['river'] },
+    { t: '母亲把旧衣服拆开，重新缝成别的东西，从不扔。', tags: ['person'] },
+    { t: '他把每把钥匙都试了一遍，最后是从窗子进去的。', tags: ['key'] },
+    { t: '没有人知道那些书是谁搬走的，只知道第二天架子就空了。', tags: ['book'] },
+    { t: '我在本子上画了三条线，代表河、路和家，后来忘了哪条是哪条。', tags: ['river'] },
+    { t: '他把名字写在门背后，说这样屋子就认得他了。', tags: ['door'] },
+    { t: '天亮时雾散了，露出对面一整排没有人住的房子。', tags: ['house'] },
+    { t: '她只留下一句话：东西都在原处，人不用回来。', tags: ['person'] },
+    { t: '我把钟拨回一小时，于是那年的冬天长出了六十分钟。', tags: ['clock'] }
+  ];
+  var CLOSES = [
+    { t: '多年以后我才明白，他拆的不是钟，是时间。', tags: ['clock'] },
+    { t: '钥匙还在原处，门已经不在了。', tags: ['key', 'door'] },
+    { t: '我不确定那算不算告别，但我知道，那天没有人回头。', tags: ['person'] },
+    { t: '这就是记忆的全部：一个人，一间屋子，和一句没说完的话。', tags: ['room'] },
+    { t: '后来图书馆拆了，那些没有写出来的书，才终于有了地方去。', tags: ['book'] },
+    { t: '父亲一直没有回来，桌上的零件也没有人再动。', tags: ['clock'] },
+    { t: '我们把它埋在后院，第二年那里长出一棵树，谁也不承认是自己种的。', tags: ['plant'] },
+    { t: '名字被念错了很多年，后来连他本人也习惯了。', tags: ['person'] },
+    { t: '我把那封信读了三遍，还是没读懂最后一句，只好先收起来。', tags: ['letter'] },
+    { t: '屋子空了以后，光反而变得很具体。', tags: ['light'] },
+    { t: '那扇门后来打开了，里面还是那扇门。', tags: ['door'] },
+    { t: '我终于数清了过河的人，却忘了自己为什么要数。', tags: ['river'] },
+    { t: '一切都被记下来了，只是没有人再去看。', tags: ['book', 'work'] },
+    { t: '所谓永远，大约就是一只停在十一点的钟。', tags: ['clock'] },
+    { t: '有些门一直开着，走进去才知道里面是空的。', tags: ['door'] },
+    { t: '后来我才知道，那一年他什么也没有写。', tags: ['book', 'work'] },
+    { t: '灯还亮着，只是屋里没有人再需要它。', tags: ['light'] },
+    { t: '河水退了，桥还在，过桥的人换了。', tags: ['river'] },
+    { t: '我们谁也没有提那件事，好像提了就会成真。', tags: ['person'] },
+    { t: '他留下的那本书，最后一页写着：待续。', tags: ['book'] },
+    { t: '后来那条街改了名字，邮差还是按旧地址送信。', tags: ['person'] },
+    { t: '窗子朝北，一年里只有三天能晒到太阳。', tags: ['light'] },
+    { t: '他再也没有修过钟，家里也没有再添过一只。', tags: ['clock'] },
+    { t: '我们走的时候没有关灯，好像还会回来。', tags: ['light'] },
+    { t: '那口井后来填了，填井的人说，底下什么也没有。', tags: ['house'] },
+    { t: '书还在，只是没有人再翻开它。', tags: ['book'] }
+  ];
+
+  /* ---------- 工具 ---------- */
+  function cjkCount(s) {
+    var m = s.match(/[\u4e00-\u9fa5]/g);
+    return m ? m.length : 0;
+  }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function fmtDate(d) {
+    return d.getUTCFullYear() + '.' + pad2(d.getUTCMonth() + 1) + '.' + pad2(d.getUTCDate());
+  }
+  function withComma(s) { return s; }
+
+  function pickTagged(r, list, tags, localUsed, sentUsed) {
+    var hit = [], rest = [], alt = [], i, j, s, ok;
+    for (i = 0; i < list.length; i++) {
+      s = list[i];
+      if (localUsed[s.t] || sentUsed[s.t]) continue;
+      ok = false;
+      for (j = 0; j < s.tags.length; j++) {
+        if (tags.indexOf(s.tags[j]) >= 0) { ok = true; break; }
+      }
+      if (ok) hit.push(s); else rest.push(s);
+    }
+    if (hit.length) return r.pick(hit);
+    if (rest.length) return r.pick(rest);
+    /* 该组句库已用尽：只排除本次摘录内的重复 */
+    for (i = 0; i < list.length; i++) {
+      s = list[i];
+      if (!localUsed[s.t]) alt.push(s);
+    }
+    return alt.length ? r.pick(alt) : null;
+  }
+
+  /* ---------- 生成器 ---------- */
+  function makeAuthor(r) {
+    var name = r.pick(SURNAMES) + (r.chance(0.55) ? r.pick(GIVEN_1) : r.pick(GIVEN_2));
+    var nation = r.weighted(NATIONS);
+    if (r.chance(0.07)) return { name: name, born: null, died: null, life: '生年不详', nation: nation };
+    var born = r.int(1858, 1992);
+    var died = null;
+    if (born <= 1950) {
+      died = r.int(born + 32, Math.min(2024, born + 95));
+    } else if (r.chance(0.45)) {
+      died = r.int(born + 32, Math.min(2024, born + 95));
+    }
+    return {
+      name: name, born: born, died: died,
+      life: died ? (born + '—' + died) : (born + '—'),
+      nation: nation
+    };
+  }
+
+  function makeYear(r, author) {
+    var minY = Math.max(1890, author.born ? author.born + 20 : 1890);
+    var maxY = Math.min(2016, author.died ? author.died : 2016);
+    if (maxY < minY) return null;
+    return r.int(minY, maxY);
+  }
+
+  function pickTitle(r, year, kCount, prevK) {
+    var total = 0, i, j, roll, gen, out, title, genres;
+    for (i = 0; i < TITLE_GENS.length; i++) total += TITLE_GENS[i].w;
+    for (var attempt = 0; attempt < 30; attempt++) {
+      roll = r.f() * total; gen = TITLE_GENS[TITLE_GENS.length - 1];
+      for (i = 0; i < TITLE_GENS.length; i++) {
+        roll -= TITLE_GENS[i].w;
+        if (roll <= 0) { gen = TITLE_GENS[i]; break; }
+      }
+      if ((kCount[gen.k] || 0) >= 6) continue;
+      if (gen.k === prevK) continue;
+      out = gen.make(r, year);
+      if (!out) continue;
+      title = typeof out === 'string' ? out : out.t;
+      genres = (typeof out === 'object' && out.genres) ? out.genres : gen.genres;
+      if (!title || title.replace(/\s/g, '').length > 10) continue;
+      return [title, gen.k, genres];
+    }
+    /* 兜底：放宽句式配额 */
+    for (j = 0; j < 40; j++) {
+      gen = r.pick(TITLE_GENS);
+      out = gen.make(r, year);
+      if (!out) continue;
+      title = typeof out === 'string' ? out : out.t;
+      genres = (typeof out === 'object' && out.genres) ? out.genres : gen.genres;
+      if (title && title.replace(/\s/g, '').length <= 10) return [title, gen.k, genres];
+    }
+    return null;
+  }
+
+  function pickPress(r, year, use) {
+    var era = year < 1949 ? 'old' : (year < 1990 ? 'mid' : 'now');
+    var list = PRESS[era], attempt, p;
+    for (attempt = 0; attempt < 14; attempt++) {
+      p = r.pick(list);
+      if ((use[p] || 0) < 3) { use[p] = (use[p] || 0) + 1; return p; }
+    }
+    return r.pick(list);
+  }
+
+  function pickBlurb(r, kCount, genrePool, ctx) {
+    var total = 0, i, roll, gen, pool;
+    for (i = 0; i < BLURB_GENS.length; i++) total += BLURB_GENS[i].w;
+    pool = (genrePool && genrePool.length) ? genrePool : B_GENRE;
+    for (var attempt = 0; attempt < 24; attempt++) {
+      roll = r.f() * total; gen = BLURB_GENS[BLURB_GENS.length - 1];
+      for (i = 0; i < BLURB_GENS.length; i++) {
+        roll -= BLURB_GENS[i].w;
+        if (roll <= 0) { gen = BLURB_GENS[i]; break; }
+      }
+      if ((kCount[gen.k] || 0) >= 8) continue;
+      if (gen.ok && !gen.ok(ctx)) continue;
+      kCount[gen.k] = (kCount[gen.k] || 0) + 1;
+      return gen.make(r, r.pick(pool));
+    }
+    return BLURB_GENS[0].make(r, r.pick(pool));
+  }
+
+  function makeExcerpt(r, pairs, sentUsed) {
+    var attempt, local, start, second, third, parts, key, k;
+    for (attempt = 0; attempt < 12; attempt++) {
+      local = {};
+      start = r.pick(STARTS);
+      local[start.t] = 1;
+      second = pickTagged(r, r.chance(0.58) ? TURNS : CLOSES, start.tags, local, sentUsed);
+      if (!second) return null;
+      local[second.t] = 1;
+      key = start.t + '|' + second.t;
+      if (pairs[key]) continue;
+      pairs[key] = 1;
+      parts = [start.t, second.t];
+      if (cjkCount(parts.join('')) < 46) {
+        third = pickTagged(r, r.chance(0.5) ? TURNS : CLOSES,
+          start.tags.concat(second.tags), local, sentUsed);
+        if (third && cjkCount(parts.join('') + third.t) <= 86) {
+          parts.push(third.t);
+          local[third.t] = 1;
+        }
+      }
+      for (k = 0; k < parts.length; k++) sentUsed[parts[k]] = 1;
+      return parts.join('');
+    }
+    return null;
+  }
+
+  function makeLoans(r, year, isEgg) {
+    var names = r.shuffled(BORROWERS);
+    var rows = [], n = isEgg ? r.int(3, 4) : r.int(3, 5);
+    var i, at, out, back, late, days, step, startMs, endMs, lastYear;
+
+    if (isEgg) {
+      lastYear = r.int(1993, 1997);
+      for (i = 0; i < n; i++) {
+        at = Date.UTC(lastYear - (n - 1) + i, r.int(0, 9), r.int(1, 28));
+        out = new Date(at);
+        if (i === n - 1) {
+          rows.push({ out: fmtDate(out), back: null, who: names[i], status: '仍在借阅中' });
+          break;
+        }
+        late = r.chance(0.25);
+        days = r.int(14, 60) + (late ? r.int(5, 44) : 0);
+        back = new Date(at + days * 86400000);
+        rows.push({
+          out: fmtDate(out), back: fmtDate(back), who: names[i],
+          status: late ? '逾期' : '已还'
+        });
+      }
+      return rows;
+    }
+
+    startMs = Date.UTC(Math.max(1987, year + 2), 0, 1);
+    endMs = Date.UTC(2026, 9, 31) - 120 * 86400000;
+    if (startMs > endMs - 2 * 365 * 86400000) startMs = endMs - 2 * 365 * 86400000;
+    step = (endMs - startMs) / n;
+    for (i = 0; i < n; i++) {
+      at = startMs + Math.floor(step * (i + 0.1 + 0.72 * r.f()));
+      out = new Date(at);
+      late = r.chance(0.24);
+      days = r.int(12, 55) + (late ? r.int(4, 40) : 0);
+      back = new Date(at + days * 86400000);
+      rows.push({
+        out: fmtDate(out), back: fmtDate(back), who: names[i],
+        status: late ? '逾期' : '已还'
+      });
+    }
+    return rows;
+  }
+
+  /* 年代 → 装帧：色相 / 饱和 / 明度 / 字距 / 书脊细节 */
+  var ERA = [
+    { max: 1919, h: [16, 30], s: [22, 30], l: [24, 30], fs: 12.2, fg: 0.72, track: 0.16, band: 0.3, label: '布面精装' },
+    { max: 1949, h: [26, 42], s: [16, 24], l: [25, 31], fs: 12.0, fg: 0.75, track: 0.14, band: 0.26, label: '纸面装订' },
+    { max: 1979, h: [150, 178], s: [10, 18], l: [26, 32], fs: 11.8, fg: 0.79, track: 0.1, band: 0.22, label: '胶版平装' },
+    { max: 2004, h: [196, 216], s: [9, 15], l: [29, 35], fs: 11.9, fg: 0.83, track: 0.08, band: 0.2, label: '平装重印' },
+    { max: 2100, h: [34, 50], s: [20, 30], l: [29, 36], fs: 12.2, fg: 0.87, track: 0.07, band: 0.18, label: '精印初版' }
+  ];
+
+  function styleFor(r, year, titleLen, pages) {
+    var era = ERA[ERA.length - 1], i;
+    for (i = 0; i < ERA.length; i++) { if (year <= ERA[i].max) { era = ERA[i]; break; } }
+    var hue = r.int(era.h[0], era.h[1]) + (r.chance(0.35) ? r.int(-5, 5) : 0);
+    if (hue < 0) hue += 360;
+    var sat = r.int(era.s[0], era.s[1]);
+    var lig = r.int(era.l[0], era.l[1]);
+    var width = 27 + titleLen * 1.95 + Math.min(12, Math.round(pages / 45));
+    if (width < 32) width = 32;
+    if (width > 60) width = 60;
+    var hf = 84 + r.int(0, 16);
+    if (titleLen >= 8) hf = Math.max(hf, 94);
+    if (titleLen >= 9) hf = 100;
+    var fs = era.fs;
+    if (titleLen >= 10) fs = 10.4;
+    else if (titleLen >= 8) fs = 11.1;
+    return {
+      sh: hue, ss: sat + '%', sl: lig + '%',
+      w: Math.round(width), hf: hf, fs: fs, fg: era.fg,
+      track: era.track,
+      bandc: 'rgba(239,232,218,' + era.band + ')',
+      era: era.label
+    };
+  }
+
+  function tooSimilar(title, list) {
+    var i, j, a = title, b, n;
+    for (i = 0; i < list.length; i++) {
+      b = list[i];
+      n = 0;
+      while (n < a.length && n < b.length && a.charAt(n) === b.charAt(n)) n++;
+      if (n >= 4) return true;
+      for (j = 0; j + 4 <= a.length; j++) {
+        if (b.indexOf(a.substr(j, 4)) >= 0) return true;
+      }
+    }
+    return false;
+  }
+
+  function makeLibrary(seed, count) {
+    count = count || 36;
+    var r = makeRng(seed);
+    var books = [], titles = {}, authors = {}, excerpts = {}, pressUse = {};
+    var tplCount = {}, prevK = null, blurbCount = {};
+    var usedPairs = {}, sentUsed = {};
+    var titleList = [];
+    var guard = 0, candidate, year, t, title, excerpt, i, attempt;
+
+    while (books.length < count && guard++ < count * 80) {
+      candidate = makeAuthor(r);
+      if (authors[candidate.name]) continue;
+      year = makeYear(r, candidate);
+      if (year === null) continue;
+      t = pickTitle(r, year, tplCount, prevK);
+      if (!t) continue;
+      title = t[0];
+      if (titles[title]) continue;
+      if (tooSimilar(title, titleList)) continue;
+
+      excerpt = null;
+      for (attempt = 0; attempt < 8; attempt++) {
+        excerpt = makeExcerpt(r, usedPairs, sentUsed);
+        if (excerpt && !excerpts[excerpt]) break;
+        excerpt = null;
+      }
+      if (!excerpt) continue;
+
+      tplCount[t[1]] = (tplCount[t[1]] || 0) + 1;
+      prevK = t[1];
+      authors[candidate.name] = 1;
+      titles[title] = 1;
+      titleList.push(title);
+      excerpts[excerpt] = 1;
+
+      var late = false;
+      if (candidate.born) {
+        if (candidate.died) late = (year - candidate.born) >= (candidate.died - candidate.born) * 0.5;
+        else late = (year - candidate.born) >= 55;
+      }
+
+      var titleLen = title.replace(/\s/g, '').length;
+      var pages = r.int(12, 68) * 8;
+      var style = styleFor(r, year, titleLen, pages);
+
+      books.push({
+        title: title, template: t[1], genres: t[2],
+        author: candidate, year: year,
+        press: pickPress(r, year, pressUse),
+        pages: pages,
+        size: r.pick(['32 开', '大 32 开', '16 开', '大 16 开']),
+        blurb: pickBlurb(r, blurbCount, t[2], { late: late }),
+        excerpt: excerpt,
+        style: style,
+        isEgg: false,
+        loans: null
+      });
+    }
+
+    /* 按成书年代排序 */
+    books.sort(function (a, b) { return a.year - b.year || (a.title < b.title ? -1 : 1); });
+
+    /* 彩蛋：一本"尚未归还"的书（只从 1975 年前成书的旧书里选） */
+    var candidates = [];
+    for (i = 0; i < books.length; i++) if (books[i].year <= 1975) candidates.push(i);
+    if (!candidates.length) for (i = 0; i < books.length; i++) candidates.push(i);
+    var eggIdx = candidates[r.int(0, candidates.length - 1)];
+    books[eggIdx].isEgg = true;
+
+    var roman = ['Ⅰ', 'Ⅱ', 'Ⅲ'];
+    for (i = 0; i < books.length; i++) {
+      var b = books[i];
+      b.i = i;
+      b.shelf = Math.floor(i / 12);
+      b.idx = i % 12;
+      b.id = '04-' + roman[b.shelf] + '-' + pad2(b.idx + 1);
+      b.loans = makeLoans(r, b.year, b.isEgg);
+      b.loanCount = b.loans.length;
+    }
+
+    /* 分架 */
+    var shelves = [], s, group;
+    for (s = 0; s < Math.ceil(books.length / 12); s++) {
+      group = books.slice(s * 12, s * 12 + 12);
+      shelves.push({
+        roman: roman[s] || String(s + 1),
+        from: group[0] ? group[0].year : '',
+        to: group[group.length - 1] ? group[group.length - 1].year : '',
+        books: group
+      });
+    }
+
+    var unreturned = 0;
+    for (i = 0; i < books.length; i++) {
+      if (books[i].loans[books[i].loans.length - 1].status === '仍在借阅中') unreturned++;
+    }
+
+    return { seed: String(seed), books: books, shelves: shelves, unreturned: unreturned };
+  }
+
+  return {
+    make: makeLibrary,
+    version: '1.0',
+    cjkCount: cjkCount,
+    _rng: makeRng
+  };
+})();
+/* ==== LIBRARY-CONTENT-ENGINE :END ==== */
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  var ENGINE = window.LibraryEngine;
+  var shelfEl = document.getElementById('shelves');
+  var statsEl = document.getElementById('stats');
+  var seedEl = document.getElementById('seedline');
+  var readerEl = document.getElementById('reader');
+  var cardEl = document.getElementById('card');
+  var tipEl = document.getElementById('tip');
+  var toastEl = document.getElementById('toast');
+  var announceEl = document.getElementById('announce');
+  var rebuildBtn = document.getElementById('rebuildBtn');
+  var soundBtn = document.getElementById('soundBtn');
+
+  var state = { seed: '', books: [], shelves: [], current: null, busy: false, lastFocus: null };
+  var toastTimer = null;
+
+  /* ---------- 种子 ---------- */
+  function newSeed() {
+    var s = '';
+    var chars = '0123456789ABCDEF';
+    for (var i = 0; i < 6; i++) s += chars.charAt(Math.floor(Math.random() * 16));
+    return s;
+  }
+
+  /* ---------- 渲染书架 ---------- */
+  function render() {
+    shelfEl.innerHTML = '';
+    var frag = document.createDocumentFragment();
+
+    state.shelves.forEach(function (sh) {
+      var sec = document.createElement('section');
+      sec.className = 'shelf';
+      sec.setAttribute('aria-label', '架 ' + sh.roman);
+
+      var head = document.createElement('div');
+      head.className = 'shelf-head';
+      var range = (sh.from === sh.to) ? String(sh.from) : (sh.from + '—' + sh.to);
+      head.innerHTML = '<span>架 ' + sh.roman + '</span><span class="rule"></span><span class="yr">' + range + '</span>';
+
+      var body = document.createElement('div');
+      body.className = 'shelf-body';
+
+      var spines = document.createElement('div');
+      spines.className = 'spines';
+
+      sh.books.forEach(function (b) {
+        var st = b.style;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'spine' + (b.isEgg ? ' spine--absent' : '');
+        btn.setAttribute('data-i', b.i);
+        btn.setAttribute('aria-label', '《' + b.title + '》 ' + b.author.name + '，' + b.year + ' 年');
+        btn.style.setProperty('--sh', st.sh);
+        btn.style.setProperty('--ss', st.ss);
+        btn.style.setProperty('--sl', st.sl);
+        btn.style.setProperty('--w', st.w + 'px');
+        btn.style.setProperty('--hf', st.hf);
+        btn.style.setProperty('--fs', st.fs + 'px');
+        btn.style.setProperty('--fg', st.fg);
+        btn.style.setProperty('--bandc', st.bandc);
+        var span = document.createElement('span');
+        span.className = 'spine-t';
+        span.textContent = b.title;
+        btn.appendChild(span);
+        spines.appendChild(btn);
+      });
+
+      body.appendChild(spines);
+      var plank = document.createElement('div');
+      plank.className = 'plank';
+
+      sec.appendChild(head);
+      sec.appendChild(body);
+      sec.appendChild(plank);
+      frag.appendChild(sec);
+    });
+
+    shelfEl.appendChild(frag);
+
+    var books = state.books;
+    statsEl.textContent = books.length + ' 册　·　' + state.shelves.length + ' 架　·　' +
+      (state.unreturned || 0) + ' 册未归';
+    seedEl.textContent = 'SEED ' + state.seed;
+  }
+
+  function build(seed) {
+    var lib = ENGINE.make(seed, 36);
+    state.seed = lib.seed;
+    state.books = lib.books;
+    state.shelves = lib.shelves;
+    state.unreturned = lib.unreturned;
+    state.current = null;
+    render();
+  }
+
+  /* ---------- 提示条 ---------- */
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2400);
+  }
+
+  function announce(msg) {
+    announceEl.textContent = msg;
+  }
+
+  /* ---------- 悬浮提示 ---------- */
+  function showTip(spine) {
+    if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+    var b = state.books[Number(spine.getAttribute('data-i'))];
+    if (!b) return;
+    tipEl.querySelector('b').textContent = '《' + b.title + '》';
+    tipEl.querySelector('span').textContent = b.author.name + '　·　' + b.year + '　·　' + b.style.era;
+    tipEl.querySelector('i').textContent = '点击抽出';
+    tipEl.classList.add('show');
+    positionTip(spine);
+  }
+
+  function positionTip(spine) {
+    var r = spine.getBoundingClientRect();
+    var tw = tipEl.offsetWidth, th = tipEl.offsetHeight;
+    var left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(10, Math.min(left, window.innerWidth - tw - 10));
+    var top = r.top - th - 10;
+    if (top < 56) top = r.bottom + 12;
+    tipEl.style.left = Math.round(left) + 'px';
+    tipEl.style.top = Math.round(top) + 'px';
+  }
+
+  function hideTip() { tipEl.classList.remove('show'); }
+
+  /* ---------- 卡片 ---------- */
+  function loanRow(row) {
+    var cls = row.status === '已还' ? 'st-ok' : (row.status === '逾期' ? 'st-late' : 'st-out');
+    return '<div class="lrow">' +
+      '<span class="c1">' + row.out + '</span>' +
+      '<span class="c2">' + row.who + '</span>' +
+      '<span class="c3">' + (row.back || '—') + '</span>' +
+      '<span class="c4 ' + cls + '">' + row.status + '</span>' +
+      '</div>';
+  }
+
+  function fillCard(b) {
+    var stampText = '已归架', stampClass = '';
+    var last = b.loans[b.loans.length - 1];
+    if (last.status === '逾期') stampText = '逾期';
+    if (last.status === '仍在借阅中') { stampText = '未归还'; stampClass = ' stamp-out'; }
+
+    var html = '' +
+      '<button class="card-close" type="button" data-close aria-label="放回架上">×</button>' +
+      '<div class="c-top"><span>馆藏 ' + b.id + '</span><span class="dot"></span>' +
+      '<span>借阅 ' + b.loans.length + ' 次</span><span class="dot"></span>' +
+      '<span>' + b.style.era + '</span></div>' +
+      '<h2 class="c-title">《' + b.title + '》</h2>' +
+      '<p class="c-author">' + b.author.name +
+      '<span class="sep">·</span>' + b.author.life +
+      '<span class="sep">·</span>' + b.author.nation + '</p>' +
+      '<div class="c-meta">' +
+      '<div><div class="k">成书</div><div class="v">' + b.year + '</div></div>' +
+      '<div><div class="k">出版者</div><div class="v">' + b.press + '</div></div>' +
+      '<div><div class="k">篇幅</div><div class="v">' + b.pages + ' 页 · ' + b.size + '</div></div>' +
+      '<div><div class="k">国籍</div><div class="v">' + b.author.nation + '</div></div>' +
+      '</div>' +
+      '<p class="c-label">内容简介</p>' +
+      '<p class="c-blurb">' + b.blurb + '</p>' +
+      '<p class="c-label">原文摘录</p>' +
+      '<blockquote class="c-excerpt">' + b.excerpt + '</blockquote>' +
+      '<div class="loan">' +
+      '<div class="loan-head"><span>借 阅 卡</span><span class="no">CARD / ' + b.id + '</span></div>' +
+      '<div class="lhead"><span>借出</span><span>借阅人</span><span>归还</span><span>状态</span></div>' +
+      b.loans.map(loanRow).join('') +
+      '<div class="stamp' + stampClass + '">' + stampText + '</div>' +
+      (b.isEgg ? '<p class="egg-note">馆员注：这本书从未回到架上。我们保留了它的位置。</p>' : '') +
+      '</div>' +
+      '<div class="c-actions">' +
+      '<button class="btn btn-primary" type="button" id="copyBtn">借走这本</button>' +
+      '<button class="btn btn-ghost" type="button" data-close>放回架上</button>' +
+      '</div>';
+
+    cardEl.innerHTML = html;
+    cardEl.setAttribute('aria-label', '《' + b.title + '》');
+  }
+
+  function openBook(i) {
+    var b = state.books[i];
+    if (!b) return;
+    var prev = shelfEl.querySelector('.spine.is-out');
+    if (prev) prev.classList.remove('is-out');
+    var spine = shelfEl.querySelector('.spine[data-i="' + i + '"]');
+    if (spine) spine.classList.add('is-out');
+
+    state.current = b;
+    state.lastFocus = spine || null;
+    hideTip();
+    fillCard(b);
+    readerEl.hidden = false;
+    void readerEl.offsetWidth;
+    readerEl.classList.add('open');
+    document.body.classList.add('locked');
+    var closeBtn = cardEl.querySelector('.card-close');
+    if (closeBtn) closeBtn.setAttribute('tabindex', '-1');
+    cardEl.focus({ preventScroll: true });
+    cardEl.scrollTop = 0;
+    playRustle();
+    announce('已抽出《' + b.title + '》');
+  }
+
+  function closeReader() {
+    if (readerEl.hidden) return;
+    readerEl.classList.remove('open');
+    document.body.classList.remove('locked');
+    var prev = shelfEl.querySelector('.spine.is-out');
+    if (prev) prev.classList.remove('is-out');
+    var focusBack = state.lastFocus;
+    state.current = null;
+    setTimeout(function () {
+      readerEl.hidden = true;
+      cardEl.innerHTML = '';
+      if (focusBack && document.contains(focusBack)) focusBack.focus({ preventScroll: true });
+    }, 240);
+  }
+
+  /* ---------- 复制 ---------- */
+  function copyBook(b) {
+    var text = '《' + b.title + '》\n' +
+      b.author.name + ' · ' + b.author.life + ' · ' + b.author.nation + '\n' +
+      b.year + ' · ' + b.press + '\n\n' + b.excerpt;
+    var ok = false;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', 'readonly');
+    ta.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;border:0;padding:0';
+    document.body.appendChild(ta);
+    try {
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      ok = document.execCommand('copy');
+    } catch (err) { ok = false; }
+    document.body.removeChild(ta);
+    if (ok) {
+      toast('已借走 · 书名、作者、摘录已复制');
+      announce('已复制到剪贴板');
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast('已借走 · 书名、作者、摘录已复制');
+      }, function () {
+        toast('复制失败，请手动选择文字');
+      });
+    } else {
+      toast('复制失败，请手动选择文字');
+    }
+    cardEl.focus({ preventScroll: true });
+  }
+
+  /* ---------- 声音（默认静音） ---------- */
+  var audio = { ctx: null, on: false, noise: null };
+  function ensureCtx() {
+    if (!audio.ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audio.ctx = new AC();
+    }
+    if (audio.ctx.state === 'suspended' && audio.ctx.resume) audio.ctx.resume();
+    return audio.ctx;
+  }
+  function noiseBuffer(ctx) {
+    if (audio.noise) return audio.noise;
+    var len = Math.floor(ctx.sampleRate * 0.3);
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var data = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+    audio.noise = buf;
+    return buf;
+  }
+  function playRustle() {
+    if (!audio.on) return;
+    try {
+      var ctx = ensureCtx();
+      if (!ctx) return;
+      var src = ctx.createBufferSource();
+      src.buffer = noiseBuffer(ctx);
+      var bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 1900;
+      bp.Q.value = 0.9;
+      var gain = ctx.createGain();
+      var t = ctx.currentTime;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.07, t + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+      src.connect(bp); bp.connect(gain); gain.connect(ctx.destination);
+      src.start(t);
+      src.stop(t + 0.32);
+    } catch (err) { /* 静默失败 */ }
+  }
+
+  function setSound(on) {
+    audio.on = on;
+    soundBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    soundBtn.textContent = on ? '声 开' : '声 关';
+    soundBtn.setAttribute('aria-label', on ? '关闭声音' : '开启声音');
+    if (on) {
+      ensureCtx();
+      playRustle();
+      toast('已开启声音 · 翻页声很轻');
+    }
+  }
+
+  /* ---------- 事件 ---------- */
+  shelfEl.addEventListener('click', function (e) {
+    var spine = e.target.closest('.spine');
+    if (!spine) return;
+    openBook(Number(spine.getAttribute('data-i')));
+  });
+
+  shelfEl.addEventListener('mouseover', function (e) {
+    var spine = e.target.closest('.spine');
+    if (spine) showTip(spine);
+  });
+
+  shelfEl.addEventListener('mouseleave', hideTip);
+
+  shelfEl.addEventListener('focusin', function (e) {
+    var spine = e.target.closest('.spine');
+    if (spine) showTip(spine);
+  });
+  shelfEl.addEventListener('focusout', hideTip);
+
+  window.addEventListener('scroll', hideTip, { passive: true });
+  window.addEventListener('resize', hideTip);
+
+  readerEl.addEventListener('click', function (e) {
+    if (e.target.closest('[data-close]')) { closeReader(); return; }
+    if (e.target.closest('#copyBtn')) {
+      if (state.current) copyBook(state.current);
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      if (!readerEl.hidden) { e.preventDefault(); closeReader(); }
+    }
+  });
+
+  rebuildBtn.addEventListener('click', function () {
+    if (state.busy) return;
+    state.busy = true;
+    if (!readerEl.hidden) closeReader();
+    hideTip();
+    shelfEl.classList.add('fade');
+    setTimeout(function () {
+      var seed;
+      do { seed = newSeed(); } while (seed === state.seed);
+      build(seed);
+      shelfEl.classList.remove('fade');
+      state.busy = false;
+      toast('已重构 · 换了一批从未被写出的书');
+    }, 220);
+  });
+
+  soundBtn.addEventListener('click', function () { setSound(!audio.on); });
+
+  /* ---------- 启动 ---------- */
+  build(newSeed());
+})();
+</script>
+</body>
+</html>

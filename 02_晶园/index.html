@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>晶园 · N°02 — 奇珍室</title>
+<style>
+  :root{
+    --ink-950:#080a0f; --ink-900:#0d1119; --ink-800:#141a24; --ink-700:#1e2633;
+    --line:#2a3442; --paper:#efe8da; --text:#e6e2d8; --text-dim:#98a1ac;
+    --cyan:#6fb3a8; --amber:#d9a05b; --verm:#c05b4d; --lilac:#9a8fb8;
+    --serif:"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif;
+    --sans:"Noto Sans SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    --mono:"Cascadia Mono","Consolas","SFMono-Regular",monospace;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;margin:0;padding:0;overflow:hidden;background:var(--ink-950)}
+  body{
+    font-family:var(--sans);color:var(--text);
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  }
+  #stage{
+    position:fixed;inset:0;display:block;width:100%;height:100%;
+    touch-action:manipulation;cursor:crosshair;
+  }
+
+  /* ---------- 返回 ---------- */
+  .back{
+    position:fixed;top:20px;left:clamp(14px,3vw,32px);z-index:20;
+    font-size:12px;letter-spacing:.14em;color:var(--text-dim);text-decoration:none;
+    padding:6px 2px;transition:color .24s var(--ease);
+  }
+  .back:hover,.back:focus-visible{color:var(--paper);outline:none}
+
+  /* ---------- 落款 ---------- */
+  .sign{
+    position:fixed;right:clamp(14px,3vw,32px);bottom:clamp(16px,3vw,32px);z-index:20;
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--text-dim);
+    opacity:.72;pointer-events:none;white-space:nowrap;
+  }
+
+  /* ---------- 浮动面板 ---------- */
+  .dock{
+    position:fixed;left:clamp(14px,3vw,32px);bottom:clamp(14px,3vw,32px);
+    z-index:20;width:274px;
+  }
+  .panel{
+    position:relative;padding:15px 16px 14px;
+    border:1px solid rgba(42,52,66,.95);
+    background:rgba(13,17,25,.70);
+    -webkit-backdrop-filter:blur(16px) saturate(1.2);
+    backdrop-filter:blur(16px) saturate(1.2);
+    box-shadow:0 26px 60px -32px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .panel::before{
+    content:"";position:absolute;left:16px;right:16px;top:-1px;height:1px;
+    background:linear-gradient(90deg,rgba(111,179,168,.6),rgba(154,143,184,.22) 58%,rgba(154,143,184,0));
+  }
+  .p-head{display:flex;align-items:baseline;gap:9px;margin-bottom:12px}
+  .p-title{
+    font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:.28em;
+    color:var(--paper);line-height:1;
+  }
+  .p-no{
+    font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--cyan);
+    opacity:.85;line-height:1;
+  }
+  .p-spacer{flex:1 1 auto}
+
+  .p-stats{
+    display:grid;grid-template-columns:1fr 1fr 1fr;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    margin-bottom:12px;
+  }
+  .p-stats>div{padding:8px 0 7px}
+  .p-stats>div+div{border-left:1px solid rgba(42,52,66,.7);padding-left:10px}
+  .p-stats b{
+    display:block;font-family:var(--mono);font-size:14px;font-weight:400;
+    color:var(--text);letter-spacing:.01em;font-variant-numeric:tabular-nums;line-height:1.1;
+  }
+  .p-stats i{
+    display:block;font-style:normal;font-size:9.5px;letter-spacing:.2em;
+    color:var(--text-dim);margin-top:4px;line-height:1;
+  }
+
+  .p-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .btn{
+    -webkit-appearance:none;appearance:none;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    min-height:33px;padding:0 8px;margin:0;
+    border:1px solid var(--line);border-radius:1px;
+    background:rgba(30,38,51,.42);color:var(--text);
+    font-family:var(--sans);font-size:11.5px;letter-spacing:.07em;line-height:1;
+    cursor:pointer;white-space:nowrap;
+    transition:background .22s var(--ease),border-color .22s var(--ease),color .22s var(--ease),opacity .22s var(--ease);
+  }
+  .btn svg{
+    width:13px;height:13px;flex:0 0 auto;opacity:.82;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+  .btn:hover{background:rgba(111,179,168,.11);border-color:rgba(111,179,168,.42);color:#fff}
+  .btn:hover svg{opacity:1}
+  .btn:active{transform:translateY(.5px)}
+  .btn:focus-visible{outline:1px solid var(--cyan);outline-offset:2px}
+  .btn[aria-pressed="true"]{
+    background:rgba(111,179,168,.15);border-color:rgba(111,179,168,.55);color:#d5ece6;
+  }
+  .btn[aria-pressed="true"] svg{opacity:1}
+  .btn--wide{grid-column:1 / -1}
+  .btn--icon{grid-column:auto;min-width:0;padding:0}
+  .sound-desk{width:24px;height:24px;min-height:24px;border-color:transparent;background:transparent;align-self:center}
+  .sound-desk:hover{background:rgba(111,179,168,.12);border-color:transparent}
+  .sound-mob{display:none}
+  .btn.is-busy{opacity:.55;pointer-events:none}
+
+  /* ---------- 提示 ---------- */
+  .hint{
+    position:absolute;left:1px;bottom:100%;margin-bottom:11px;
+    display:flex;align-items:center;gap:8px;
+    font-size:11.5px;letter-spacing:.16em;color:var(--text-dim);white-space:nowrap;
+    opacity:0;transform:translateY(5px);
+    transition:opacity .55s var(--ease),transform .55s var(--ease);
+    pointer-events:none;
+  }
+  .hint::before{
+    content:"";width:5px;height:5px;flex:0 0 auto;
+    border:1px solid var(--cyan);transform:rotate(45deg);opacity:.85;
+  }
+  .hint.show{opacity:1;transform:translateY(0)}
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;left:50%;bottom:26px;z-index:40;
+    transform:translate(-50%,6px);
+    padding:9px 16px;border:1px solid var(--line);
+    background:rgba(13,17,25,.92);color:var(--paper);
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;white-space:nowrap;
+    opacity:0;pointer-events:none;
+    transition:opacity .3s var(--ease),transform .3s var(--ease);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- 移动端：收成底部一行图标 ---------- */
+  @media (max-width:700px){
+    .back{top:18px;left:14px;font-size:11.5px}
+    .sign{top:19px;right:14px;bottom:auto;font-size:10px;letter-spacing:.14em}
+    .dock{left:10px;right:10px;bottom:10px;width:auto}
+    .panel{padding:7px}
+    .panel::before{left:10px;right:10px}
+    .p-head{display:none}
+    .p-stats{display:none}
+    .p-actions{grid-template-columns:repeat(6,1fr);gap:5px}
+    .btn{min-height:44px;padding:0}
+    .btn .bt{display:none}
+    .btn svg{width:17px;height:17px}
+    .btn--wide{grid-column:auto}
+    .sound-mob{display:inline-flex;border-color:var(--line);background:rgba(30,38,51,.42)}
+    .sound-mob[aria-pressed="true"]{background:rgba(111,179,168,.15);border-color:rgba(111,179,168,.55)}
+    .hint{left:2px;bottom:100%;margin-bottom:9px;font-size:11px;letter-spacing:.12em}
+    .toast{bottom:92px;font-size:10.5px}
+  }
+  @media (max-width:380px){
+    .p-actions{grid-template-columns:repeat(6,1fr);gap:4px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .hint,.toast,.btn{transition-duration:.01ms}
+  }
+</style>
+</head>
+<body>
+<canvas id="stage" role="img" aria-label="深色容器中缓慢生长的分形晶体。点击容器任意位置可种下一颗晶核。"></canvas>
+
+<a class="back" href="../00_从这里开始.html">←&nbsp;奇珍室</a>
+<div class="sign">N°02 · 晶园</div>
+
+<div class="dock">
+  <div class="hint" id="hint">点一下，种一颗晶核</div>
+  <div class="panel">
+    <div class="p-head">
+      <span class="p-title">晶园</span>
+      <span class="p-no">N°02</span>
+      <span class="p-spacer"></span>
+      <button class="btn btn--icon sound-desk" id="btnSoundA" type="button" aria-pressed="false" aria-label="声音：关闭" title="声音 (M)"></button>
+    </div>
+    <div class="p-stats">
+      <div><b id="stCluster">0</b><i>晶 簇</i></div>
+      <div><b id="stWalker">0</b><i>微 粒</i></div>
+      <div><b id="stCell">0</b><i>沉 积</i></div>
+    </div>
+    <div class="p-actions">
+      <button class="btn btn--wide" id="btnSeed" type="button" title="新晶种 (N)"><span class="ic"></span><span class="bt">新晶种</span></button>
+      <button class="btn" id="btnSym" type="button" aria-pressed="false" title="六方对称 (S)"><span class="ic"></span><span class="bt">六方对称</span></button>
+      <button class="btn" id="btnSpeed" type="button" title="加速 / 暂停 (空格)"><span class="ic"></span><span class="bt">速度 ×1</span></button>
+      <button class="btn" id="btnClear" type="button" title="清空 (C)"><span class="ic"></span><span class="bt">清空</span></button>
+      <button class="btn" id="btnSave" type="button" title="保存 PNG (P)"><span class="ic"></span><span class="bt">保存 PNG</span></button>
+      <button class="btn btn--icon sound-mob" id="btnSoundB" type="button" aria-pressed="false" aria-label="声音：关闭" title="声音 (M)"></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     0 · 环境
+     ============================================================ */
+  var canvas = document.getElementById('stage');
+  var ctx = canvas.getContext('2d', { alpha: false });
+  var reduceMotion = false;
+  try {
+    reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch (err) { reduceMotion = false; }
+
+  var TAU = Math.PI * 2;
+  var GRID = 640;                 // 逻辑网格固定
+  var N = GRID * GRID;
+  var POOL = 220;                 // 活性微粒池
+  var STICK_TARGET = 8;           // 每帧成功粘附数（×1 速度）
+  var STEP_CAP = 52000;           // 每帧步数上限
+  var SPEEDS = [1, 2, 4];
+  var PSTICK = 0.75;              // 粘附概率
+  var MARGIN = 6, MARGIN_VAR = 14;// 投放环距晶面距离
+  var KILL = 50;                  // 游走超出晶面 KILL 格即回收
+  var MAX_STEPS = 4500;           // 单次游走步数上限（超过则重投）
+  var MAX_CLUSTERS = 40;
+  var FILL = 0.56;                // 取景：晶体占画幅比例
+  var VIEW_MIN = 150;             // 取景：最近距离（格）
+  var PREGROW = 1750;             // 首屏预生长粒数
+
+  var COS = [], SIN = [];
+  for (var k = 0; k < 6; k++) { COS.push(Math.cos(k * Math.PI / 3)); SIN.push(Math.sin(k * Math.PI / 3)); }
+
+  /* ---------- 随机数（xorshift32，足够快） ---------- */
+  var rs = ((Date.now() & 0xffff) ^ 0x9e3779b9) | 0 || 123456789;
+  function rnd() {
+    var x = rs;
+    x ^= x << 13; x |= 0;
+    x ^= x >>> 17;
+    x ^= x << 5; x |= 0;
+    rs = x;
+    return (x >>> 0) / 4294967296;
+  }
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+  function fmtThousand(n) {
+    var s = String(n), out = '', c = 0;
+    for (var i = s.length - 1; i >= 0; i--) {
+      out = s.charAt(i) + out;
+      if (++c % 3 === 0 && i > 0) out = ',' + out;
+    }
+    return out;
+  }
+
+  /* ============================================================
+     1 · 色板 / 颜色查找表
+     ============================================================ */
+  var PALETTES = [
+    { name: '青玉', h0: 152, h1: 178, w: 24 },
+    { name: '湖青', h0: 180, h1: 204, w: 26 },
+    { name: '藕荷', h0: 231, h1: 256, w: 24 },
+    { name: '薄紫', h0: 252, h1: 280, w: 13 },
+    { name: '琥珀', h0: 26,  h1: 44,  w: 8 },
+    { name: '朱砂', h0: 3,   h1: 19,  w: 5 }
+  ];
+  var SAT = 45;
+  var LEVEL_L = [31, 38, 46, 57, 74];
+
+  function hslToRgb(h, s, l) {
+    h = ((h % 360) + 360) % 360; s /= 100; l /= 100;
+    var c = (1 - Math.abs(2 * l - 1)) * s;
+    var hp = h / 60, x = c * (1 - Math.abs((hp % 2) - 1));
+    var r = 0, g = 0, b = 0;
+    if (hp < 1) { r = c; g = x; }
+    else if (hp < 2) { r = x; g = c; }
+    else if (hp < 3) { g = c; b = x; }
+    else if (hp < 4) { g = x; b = c; }
+    else if (hp < 5) { r = x; b = c; }
+    else { r = c; b = x; }
+    var m = l - c / 2;
+    return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+  }
+
+  // 256 色相 × 5 个受光等级 → 预打包 ABGR
+  var LUT = new Uint32Array(256 * 5);
+  (function buildLUT() {
+    for (var i = 0; i < 256; i++) {
+      var h = i * 360 / 256;
+      for (var l = 0; l < 5; l++) {
+        var rgb = hslToRgb(h, SAT, LEVEL_L[l]);
+        LUT[i * 5 + l] = (255 << 24) | (rgb[2] << 16) | (rgb[1] << 8) | rgb[0];
+      }
+    }
+  })();
+
+  function pickPalette(avoidIndex) {
+    var total = 0, i;
+    for (i = 0; i < PALETTES.length; i++) total += PALETTES[i].w;
+    for (var tries = 0; tries < 6; tries++) {
+      var r = rnd() * total, acc = 0, idx = 0;
+      for (i = 0; i < PALETTES.length; i++) { acc += PALETTES[i].w; if (r <= acc) { idx = i; break; } }
+      if (idx !== avoidIndex || tries === 5) return idx;
+    }
+    return 0;
+  }
+
+  /* ============================================================
+     2 · 网格与图层
+     ============================================================ */
+  var occ = new Uint8Array(N);   // 占据
+  var own = new Uint8Array(N);   // 归属晶簇（idx+1）
+  var hue = new Uint8Array(N);   // 色相索引 0..255
+
+  var cc = document.createElement('canvas');
+  cc.width = GRID; cc.height = GRID;
+  var cctx = cc.getContext('2d');
+  var imgData = cctx.createImageData(GRID, GRID);
+  var px = new Uint32Array(imgData.data.buffer);
+
+  var gcWide = document.createElement('canvas');   // 160 · 大范围辉光
+  gcWide.width = gcWide.height = 160;
+  var gctxWide = gcWide.getContext('2d');
+  var gcTight = document.createElement('canvas');  // 320 · 近场辉光
+  gcTight.width = gcTight.height = 320;
+  var gctxTight = gcTight.getContext('2d');
+  var gcHalo = document.createElement('canvas');   // 80 · 极外层晕
+  gcHalo.width = gcHalo.height = 80;
+  var gctxHalo = gcHalo.getContext('2d');
+
+  var glowDirty = true;
+  var cellDirty = false;
+
+  var totalCells = 0;
+  var clusters = [];
+  var clustersEver = 0;
+  var lastPalette = -1;
+  var firstSeedAt = 0;
+  var symOn = false;
+
+  /* ---------- 自动取景（camera fit） ---------- */
+  var bbox = { minX: GRID, maxX: -1, minY: GRID, maxY: -1 };
+  var cam = { cx: GRID / 2, cy: GRID / 2, view: GRID };
+  var camTarget = { cx: GRID / 2, cy: GRID / 2, view: GRID };
+
+  function resetBBox() {
+    bbox.minX = GRID; bbox.maxX = -1; bbox.minY = GRID; bbox.maxY = -1;
+    cam.cx = camTarget.cx = GRID / 2;
+    cam.cy = camTarget.cy = GRID / 2;
+    cam.view = camTarget.view = GRID;
+  }
+
+  function updateCameraTarget() {
+    if (bbox.maxX < 0) {
+      camTarget.cx = GRID / 2; camTarget.cy = GRID / 2; camTarget.view = GRID;
+      return;
+    }
+    var bw = bbox.maxX - bbox.minX + 1;
+    var bh = bbox.maxY - bbox.minY + 1;
+    var dim = bw > bh ? bw : bh;
+    var v = dim / FILL;
+    if (v < VIEW_MIN) v = VIEW_MIN;
+    if (v > GRID) v = GRID;
+    camTarget.view = v;
+    camTarget.cx = (bbox.minX + bbox.maxX + 1) / 2;
+    camTarget.cy = (bbox.minY + bbox.maxY + 1) / 2;
+  }
+
+  function updateCamera(now) {
+    var e = reduceMotion ? 1 : 0.075;
+    cam.view += (camTarget.view - cam.view) * e;
+    cam.cx += (camTarget.cx - cam.cx) * e;
+    cam.cy += (camTarget.cy - cam.cy) * e;
+    var half = cam.view / 2;
+    if (cam.cx < half) cam.cx = half;
+    if (cam.cx > GRID - half) cam.cx = GRID - half;
+    if (cam.cy < half) cam.cy = half;
+    if (cam.cy > GRID - half) cam.cy = GRID - half;
+  }
+
+  // 网格坐标 → 容器内 CSS 坐标
+  function g2sx(gx) { return vx + (gx - (cam.cx - cam.view / 2)) / cam.view * vs; }
+  function g2sy(gy) { return vy + (gy - (cam.cy - cam.view / 2)) / cam.view * vs; }
+
+  // 把画布变换到「网格坐标」空间
+  function applyCam(c) {
+    var k = vs / cam.view;
+    c.translate(vx, vy);
+    c.scale(k, k);
+    c.translate(-(cam.cx - cam.view / 2), -(cam.cy - cam.view / 2));
+  }
+
+  function paintCell(i) {
+    var x = i % GRID, y = (i / GRID) | 0;
+    var e = 0;
+    if (x > 0 && !occ[i - 1]) e++;
+    if (x < GRID - 1 && !occ[i + 1]) e++;
+    if (y > 0 && !occ[i - GRID]) e++;
+    if (y < GRID - 1 && !occ[i + GRID]) e++;
+    px[i] = LUT[hue[i] * 5 + e];
+  }
+
+  function occupy(c, gx, gy) {
+    if (gx < 0 || gy < 0 || gx >= GRID || gy >= GRID) return false;
+    var i = gy * GRID + gx;
+    if (occ[i]) return false;
+    occ[i] = 1;
+    own[i] = c.idx + 1;
+
+    // 极角 → 色相；半径 → 环状色带 + 颗粒
+    var dx = gx - c.cx, dy = gy - c.cy;
+    var t = (Math.atan2(dy, dx) + Math.PI) / TAU;
+    var h = c.h0 + (c.h1 - c.h0) * t;
+    var rr = Math.sqrt(dx * dx + dy * dy);
+    h += 7 * Math.sin(rr * 0.055 + c.phase) + (rnd() - 0.5) * 5;
+    if (h < 0) h += 360; else if (h >= 360) h -= 360;
+    hue[i] = (h * 0.7083333) | 0;
+
+    paintCell(i);
+    if (gx > 0 && occ[i - 1]) paintCell(i - 1);
+    if (gx < GRID - 1 && occ[i + 1]) paintCell(i + 1);
+    if (gy > 0 && occ[i - GRID]) paintCell(i - GRID);
+    if (gy < GRID - 1 && occ[i + GRID]) paintCell(i + GRID);
+
+    if (rr > c.r) c.r = rr;
+    if (gx < bbox.minX) bbox.minX = gx;
+    if (gx > bbox.maxX) bbox.maxX = gx;
+    if (gy < bbox.minY) bbox.minY = gy;
+    if (gy > bbox.maxY) bbox.maxY = gy;
+    c.stuck++;
+    totalCells++;
+    cellDirty = true;
+    return true;
+  }
+
+  // 该格是否紧贴已占据处（用于六方补位，避免长出孤点）
+  function touches(x, y) {
+    if (x < 0 || y < 0 || x >= GRID || y >= GRID) return false;
+    var i = y * GRID + x;
+    if (occ[i]) return false;
+    if (x > 0 && occ[i - 1]) return true;
+    if (x < GRID - 1 && occ[i + 1]) return true;
+    if (y > 0 && occ[i - GRID]) return true;
+    if (y < GRID - 1 && occ[i + GRID]) return true;
+    return false;
+  }
+
+  function depositAt(c, gx, gy) {
+    occupy(c, gx, gy);
+    if (symOn) {
+      var dx = gx - c.cx, dy = gy - c.cy;
+      for (var k = 1; k < 6; k++) {
+        var ox = Math.round(c.cx + dx * COS[k] - dy * SIN[k]);
+        var oy = Math.round(c.cy + dx * SIN[k] + dy * COS[k]);
+        // 只有贴住晶面才补，否则会散成孤点
+        if (touches(ox, oy)) occupy(c, ox, oy);
+      }
+    }
+  }
+
+  /* ============================================================
+     3 · 晶簇
+     ============================================================ */
+  function addCluster(cx, cy, palIdx, pending) {
+    var p = PALETTES[palIdx];
+    var c = {
+      idx: clusters.length,
+      cx: cx, cy: cy,
+      h0: p.h0, h1: p.h1,
+      r: 0, pending: pending, stuck: 0,
+      phase: rnd() * TAU,
+      name: p.name
+    };
+    clusters.push(c);
+    clustersEver++;
+    lastPalette = palIdx;
+    if (!firstSeedAt) firstSeedAt = performance.now();
+    // 晶核：十字五格
+    occupy(c, cx, cy);
+    occupy(c, cx + 1, cy); occupy(c, cx - 1, cy);
+    occupy(c, cx, cy + 1); occupy(c, cx, cy - 1);
+    return c;
+  }
+
+  function nearestFree(gx, gy, maxR) {
+    if (gx < 0 || gy < 0 || gx >= GRID || gy >= GRID) return null;
+    if (!occ[gy * GRID + gx]) return { x: gx, y: gy };
+    maxR = maxR || 34;
+    for (var rr = 1; rr < maxR; rr++) {
+      var steps = Math.min(48, Math.max(8, rr * 4));
+      var a0 = rnd() * TAU;
+      for (var s = 0; s < steps; s++) {
+        var a = a0 + s * TAU / steps;
+        var x = Math.round(gx + Math.cos(a) * rr);
+        var y = Math.round(gy + Math.sin(a) * rr);
+        if (x < 2 || y < 2 || x > GRID - 3 || y > GRID - 3) continue;
+        if (!occ[y * GRID + x]) return { x: x, y: y };
+      }
+    }
+    return null;
+  }
+
+  function randomFreeSpot() {
+    for (var t = 0; t < 120; t++) {
+      var x = Math.round(GRID * (0.10 + rnd() * 0.80));
+      var y = Math.round(GRID * (0.10 + rnd() * 0.80));
+      if (occ[y * GRID + x]) continue;
+      if (nearbyOwner(x, y) >= 0) continue;   // 不贴着已有晶体，免得变成「浇灌」
+      return { x: x, y: y };
+    }
+    return null;
+  }
+
+  // 点到的位置紧贴哪一簇（用于「浇灌」而不是另起一簇）
+  function nearbyOwner(x, y) {
+    for (var rad = 0; rad <= 4; rad++) {
+      for (var dy = -rad; dy <= rad; dy++) {
+        for (var dx = -rad; dx <= rad; dx++) {
+          if (rad > 0 && dx > -rad && dx < rad && dy > -rad && dy < rad) continue;
+          var xx = x + dx, yy = y + dy;
+          if (xx < 0 || yy < 0 || xx >= GRID || yy >= GRID) continue;
+          var i = yy * GRID + xx;
+          if (occ[i]) return own[i] - 1;
+        }
+      }
+    }
+    return -1;
+  }
+
+  // 六方对称：把已有晶簇一次性补成六重对称（此后新生长自然保持对称）
+  function symmetrizeAll() {
+    for (var ci = 0; ci < clusters.length; ci++) {
+      var c = clusters[ci];
+      var tag = ci + 1;
+      var x0 = Math.max(0, Math.floor(c.cx - c.r - 3));
+      var x1 = Math.min(GRID - 1, Math.ceil(c.cx + c.r + 3));
+      var y0 = Math.max(0, Math.floor(c.cy - c.r - 3));
+      var y1 = Math.min(GRID - 1, Math.ceil(c.cy + c.r + 3));
+      for (var y = y0; y <= y1; y++) {
+        for (var x = x0; x <= x1; x++) {
+          if (own[y * GRID + x] !== tag) continue;
+          var dx = x - c.cx, dy = y - c.cy;
+          for (var k = 1; k < 6; k++) {
+            occupy(c,
+              Math.round(c.cx + dx * COS[k] - dy * SIN[k]),
+              Math.round(c.cy + dx * SIN[k] + dy * COS[k]));
+          }
+        }
+      }
+    }
+  }
+
+  /* ============================================================
+     4 · 微粒（随机游走者）
+     ============================================================ */
+  var wx = new Int32Array(POOL), wy = new Int32Array(POOL);
+  var wst = new Int32Array(POOL), wcl = new Int32Array(POOL);
+  var alive = new Uint8Array(POOL);
+  var DX = new Int8Array([1, 0, -1, 0]), DY = new Int8Array([0, 1, 0, -1]);
+  var rr = -1;
+
+  function pickCluster() {
+    var L = clusters.length;
+    if (!L) return -1;
+    for (var k = 0; k < L; k++) {
+      rr = (rr + 1) % L;
+      if (clusters[rr].pending > 0) return rr;
+    }
+    return -1;
+  }
+
+  function spawnWalker(i) {
+    var ci = pickCluster();
+    if (ci < 0) return false;
+    var c = clusters[ci];
+    var base = c.r + MARGIN + rnd() * MARGIN_VAR;
+    var a0 = rnd() * TAU;
+    for (var t = 0; t < 8; t++) {
+      var a = a0 + t * 0.7;
+      var x = Math.round(c.cx + Math.cos(a) * base);
+      var y = Math.round(c.cy + Math.sin(a) * base);
+      if (x < 1) x = 1; else if (x > GRID - 2) x = GRID - 2;
+      if (y < 1) y = 1; else if (y > GRID - 2) y = GRID - 2;
+      if (!occ[y * GRID + x]) {
+        wx[i] = x; wy[i] = y; wst[i] = 0; wcl[i] = ci;
+        alive[i] = 1;
+        return true;
+      }
+    }
+    return false;   // 该环上暂时没有空位，下一轮再投
+  }
+
+  function aliveCount() {
+    var n = 0;
+    for (var i = 0; i < POOL; i++) if (alive[i]) n++;
+    return n;
+  }
+
+  /* ---------- 分帧生长：一次推进 N 微粒，粘不上就重投 ---------- */
+  function stepWalkers(target, cap) {
+    var sticks = 0, steps = 0, guard = 0;
+
+    while (sticks < target && steps < cap) {
+      var any = false;
+      for (var i = 0; i < POOL; i++) {
+        if (!alive[i]) {
+          if (!spawnWalker(i)) continue;
+        }
+        any = true;
+
+        var ci = wcl[i];
+        var c = clusters[ci];
+        if (!c) { alive[i] = 0; continue; }
+        var x = wx[i], y = wy[i];
+        var d = (rnd() * 4) | 0;
+        var nx = x + DX[d], ny = y + DY[d];
+        steps++;
+
+        if (nx < 0 || ny < 0 || nx >= GRID || ny >= GRID) { alive[i] = 0; continue; }
+        var ni = ny * GRID + nx;
+
+        if (occ[ni]) {
+          // 碰到晶面：按概率粘附
+          if (rnd() < PSTICK) {
+            depositAt(c, x, y);
+            c.pending--;          // 预算按「成功沉积」计，不按「投放过」计
+            sticks++;
+            alive[i] = 0;
+            if (sticks >= target) break;
+          }
+          continue;
+        }
+
+        var ddx = nx - c.cx, ddy = ny - c.cy;
+        var kill = c.r + KILL;
+        if (ddx * ddx + ddy * ddy > kill * kill) { alive[i] = 0; continue; }
+
+        wx[i] = nx; wy[i] = ny;
+        if (++wst[i] > MAX_STEPS) { alive[i] = 0; }  // 游走太散 → 重投
+      }
+      if (!any) break;
+      if (++guard > 400000) break;
+    }
+    return sticks;
+  }
+
+  function grow(mult) {
+    if (mult <= 0) return;
+    stepWalkers(STICK_TARGET * mult, STEP_CAP * mult);
+  }
+
+  // 首屏用：一次性把首簇长到「像样」，不做分帧
+  function pregrow(n) {
+    var total = 0, guard = 0;
+    while (total < n && guard++ < 40) {
+      total += stepWalkers(n - total, 80000000);
+    }
+  }
+
+  /* ============================================================
+     5 · 布局 / 背景层
+     ============================================================ */
+  var W = 0, H = 0, DPR = 1, SX = 1, SY = 1, vx = 0, vy = 0, vs = 0;
+  var bg = document.createElement('canvas');
+  var bgctx = bg.getContext('2d');
+
+  function layout() {
+    W = Math.max(320, window.innerWidth || document.documentElement.clientWidth || 320);
+    H = Math.max(320, window.innerHeight || document.documentElement.clientHeight || 320);
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    var maxPixels = 3.6e6;
+    if (W * H * DPR * DPR > maxPixels) DPR = Math.max(1, Math.sqrt(maxPixels / (W * H)));
+
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    SX = canvas.width / W;
+    SY = canvas.height / H;
+    ctx.setTransform(SX, 0, 0, SY, 0, 0);
+
+    var mobile = W < 700;
+    var topPad = mobile ? 74 : 48;
+    var botPad = mobile ? 104 : 48;
+    var availW = W - (mobile ? 32 : 96);
+    var availH = H - topPad - botPad;
+    var s = Math.min(availW, availH, 900);
+    s = Math.max(160, Math.floor(s));
+    vs = s;
+    vx = Math.round((W - s) / 2);
+    vy = Math.round(topPad + (availH - s) / 2);
+
+    buildBG();
+    composite(performance.now());
+  }
+
+  function buildBG() {
+    bg.width = canvas.width;
+    bg.height = canvas.height;
+    var g = bgctx;
+    g.setTransform(SX, 0, 0, SY, 0, 0);
+
+    g.fillStyle = '#080a0f';
+    g.fillRect(0, 0, W, H);
+
+    // 环境微光
+    var rg = g.createRadialGradient(W * 0.5, H * 0.42, 0, W * 0.5, H * 0.42, Math.max(W, H) * 0.72);
+    rg.addColorStop(0, 'rgba(21,34,42,0.55)');
+    rg.addColorStop(0.5, 'rgba(11,15,21,0.30)');
+    rg.addColorStop(1, 'rgba(8,10,15,0)');
+    g.fillStyle = rg;
+    g.fillRect(0, 0, W, H);
+
+    // 容器底
+    g.fillStyle = '#0a0e15';
+    g.fillRect(vx, vy, vs, vs);
+
+    // 容器底的一层极暗青光，给死黑一点层次
+    var cg = g.createRadialGradient(vx + vs / 2, vy + vs * 0.46, 0, vx + vs / 2, vy + vs * 0.46, vs * 0.66);
+    cg.addColorStop(0, 'rgba(111,179,168,0.07)');
+    cg.addColorStop(0.5, 'rgba(111,179,168,0.028)');
+    cg.addColorStop(1, 'rgba(111,179,168,0)');
+    g.fillStyle = cg;
+    g.fillRect(vx, vy, vs, vs);
+
+    // 容器内壁：极轻的凹陷
+    var vg = g.createRadialGradient(vx + vs / 2, vy + vs / 2, vs * 0.12, vx + vs / 2, vy + vs / 2, vs * 0.8);
+    vg.addColorStop(0, 'rgba(32,48,56,0.16)');
+    vg.addColorStop(0.72, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,0.42)');
+    g.fillStyle = vg;
+    g.fillRect(vx, vy, vs, vs);
+
+    // 矿尘：容器里的静颗粒
+    var sr = 20261109;
+    function srand() {
+      sr ^= sr << 13; sr |= 0; sr ^= sr >>> 17; sr ^= sr << 5; sr |= 0;
+      return (sr >>> 0) / 4294967296;
+    }
+    for (var i = 0; i < 240; i++) {
+      var dx = vx + srand() * vs;
+      var dy = vy + srand() * vs;
+      var a = 0.025 + srand() * 0.05;
+      g.fillStyle = 'rgba(239,232,218,' + a.toFixed(3) + ')';
+      g.fillRect(Math.round(dx), Math.round(dy), 1, 1);
+    }
+
+    // 容器细边
+    g.strokeStyle = 'rgba(42,52,66,0.95)';
+    g.lineWidth = 1;
+    g.strokeRect(vx + 0.5, vy + 0.5, vs - 1, vs - 1);
+
+    // 四角刻线
+    g.strokeStyle = 'rgba(42,52,66,0.85)';
+    g.beginPath();
+    var corners = [[vx, vy, -1, -1], [vx + vs, vy, 1, -1], [vx, vy + vs, -1, 1], [vx + vs, vy + vs, 1, 1]];
+    for (var ci = 0; ci < 4; ci++) {
+      var cx0 = corners[ci][0], cy0 = corners[ci][1], sx = corners[ci][2], sy = corners[ci][3];
+      g.moveTo(cx0 + sx * 3, cy0 + sy * 3);
+      g.lineTo(cx0 + sx * 12, cy0 + sy * 3);
+      g.moveTo(cx0 + sx * 3, cy0 + sy * 3);
+      g.lineTo(cx0 + sx * 3, cy0 + sy * 12);
+    }
+    g.stroke();
+  }
+
+  /* ============================================================
+     6 · 合成
+     ============================================================ */
+  function updateGlow() {
+    gctxTight.clearRect(0, 0, 320, 320);
+    gctxTight.imageSmoothingEnabled = true;
+    gctxTight.drawImage(cc, 0, 0, 320, 320);
+    gctxWide.clearRect(0, 0, 160, 160);
+    gctxWide.imageSmoothingEnabled = true;
+    gctxWide.drawImage(gcTight, 0, 0, 160, 160);
+    gctxHalo.clearRect(0, 0, 80, 80);
+    gctxHalo.imageSmoothingEnabled = true;
+    gctxHalo.drawImage(gcWide, 0, 0, 80, 80);
+    glowDirty = false;
+  }
+
+  var rings = [];
+  var pointer = { x: -1, y: -1, on: false, touch: false };
+
+  function drawRings(now) {
+    if (!rings.length) return;
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = rings.length - 1; i >= 0; i--) {
+      var r = rings[i];
+      var t = (now - r.t) / 780;
+      if (t >= 1) { rings.splice(i, 1); continue; }
+      var e = 1 - Math.pow(1 - t, 2);
+      var rad = 4 + e * Math.min(vs * 0.085, 84);
+      var a = (1 - t) * (1 - t) * 0.55;
+      ctx.beginPath();
+      ctx.strokeStyle = 'hsla(' + r.h.toFixed(0) + ',58%,72%,' + a.toFixed(3) + ')';
+      ctx.lineWidth = 1;
+      ctx.arc(g2sx(r.gx), g2sy(r.gy), rad, 0, TAU);
+      ctx.stroke();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawReticle() {
+    if (!pointer.on || pointer.touch) return;
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(111,179,168,0.34)';
+    ctx.lineWidth = 1;
+    ctx.arc(pointer.x, pointer.y, 6.5, 0, TAU);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(111,179,168,0.5)';
+    ctx.moveTo(pointer.x - 11, pointer.y); ctx.lineTo(pointer.x - 8, pointer.y);
+    ctx.moveTo(pointer.x + 8, pointer.y); ctx.lineTo(pointer.x + 11, pointer.y);
+    ctx.moveTo(pointer.x, pointer.y - 11); ctx.lineTo(pointer.x, pointer.y - 8);
+    ctx.moveTo(pointer.x, pointer.y + 8); ctx.lineTo(pointer.x, pointer.y + 11);
+    ctx.stroke();
+  }
+
+  /* ---------- 容器刻度：随镜头一起动，让「取景」有实感 ---------- */
+  function drawSubstrate() {
+    var step = 40;
+    var x0 = Math.max(0, Math.floor((cam.cx - cam.view / 2) / step) * step);
+    var x1 = Math.min(GRID, cam.cx + cam.view / 2);
+    var y0 = Math.max(0, Math.floor((cam.cy - cam.view / 2) / step) * step);
+    var y1 = Math.min(GRID, cam.cy + cam.view / 2);
+    var lw = cam.view / vs;   // 1 CSS px 对应的网格单位
+
+    ctx.save();
+    applyCam(ctx);
+    ctx.beginPath();
+    for (var gx = x0; gx <= x1; gx += step) {
+      var sxg = gx + 0.5;
+      ctx.moveTo(sxg, Math.max(0, cam.cy - cam.view / 2));
+      ctx.lineTo(sxg, Math.min(GRID, cam.cy + cam.view / 2));
+    }
+    for (var gy = y0; gy <= y1; gy += step) {
+      var syg = gy + 0.5;
+      ctx.moveTo(Math.max(0, cam.cx - cam.view / 2), syg);
+      ctx.lineTo(Math.min(GRID, cam.cx + cam.view / 2), syg);
+    }
+    ctx.strokeStyle = 'rgba(42,52,66,0.26)';
+    ctx.lineWidth = lw;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function composite(now) {
+    ctx.setTransform(SX, 0, 0, SY, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(bg, 0, 0, W, H);
+
+    if (glowDirty) updateGlow();
+
+    // 容器内部的一切都裁在容器里
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(vx, vy, vs, vs);
+    ctx.clip();
+
+    drawSubstrate();
+
+    var pulse = reduceMotion ? 1 : 1 + 0.06 * Math.sin(now * 0.0011);
+
+    // ① 极外层晕：大半径、低透明度、同色 —— 矿物在暗处发光的底子
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.imageSmoothingEnabled = true;
+    ctx.globalAlpha = Math.min(1, 0.24 * pulse);
+    ctx.save(); applyCam(ctx);
+    ctx.drawImage(gcHalo, -cam.view * 0.10, -cam.view * 0.10, GRID + cam.view * 0.20, GRID + cam.view * 0.20);
+    ctx.restore();
+
+    // ② 中景辉光
+    ctx.globalAlpha = Math.min(1, 0.50 * pulse);
+    ctx.save(); applyCam(ctx);
+    ctx.drawImage(gcWide, -cam.view * 0.025, -cam.view * 0.025, GRID + cam.view * 0.05, GRID + cam.view * 0.05);
+    ctx.restore();
+
+    // ③ 近场辉光
+    ctx.globalAlpha = Math.min(1, 0.34 * pulse);
+    ctx.save(); applyCam(ctx);
+    ctx.drawImage(gcTight, -cam.view * 0.006, -cam.view * 0.006, GRID + cam.view * 0.012, GRID + cam.view * 0.012);
+    ctx.restore();
+
+    // ④ 晶体本体
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.imageSmoothingEnabled = true;
+    ctx.save(); applyCam(ctx);
+    ctx.drawImage(cc, 0, 0, GRID, GRID);
+    ctx.restore();
+
+    // ⑤ 晶体自身再叠一层薄雾，让它发亮而不发灰
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = Math.min(1, 0.15 * pulse);
+    ctx.save(); applyCam(ctx);
+    ctx.drawImage(gcTight, -cam.view * 0.002, -cam.view * 0.002, GRID + cam.view * 0.004, GRID + cam.view * 0.004);
+    ctx.restore();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+
+    ctx.restore();   // 解除容器裁剪
+
+    drawRings(now);
+    drawReticle();
+  }
+
+  /* ============================================================
+     7 · HUD
+     ============================================================ */
+  var elCluster = document.getElementById('stCluster');
+  var elWalker = document.getElementById('stWalker');
+  var elCell = document.getElementById('stCell');
+  var hintEl = document.getElementById('hint');
+  var toastEl = document.getElementById('toast');
+
+  var hudAt = 0;
+  function updateHUD(now) {
+    if (now - hudAt < 180) return;
+    hudAt = now;
+    elCluster.textContent = pad2(clusters.length);
+    elWalker.textContent = pad2(aliveCount());
+    elCell.textContent = fmtThousand(totalCells);
+  }
+
+  var toastTimer = 0;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1900);
+  }
+
+  var hintDismissed = false;
+  function hideHint() {
+    if (hintDismissed) return;
+    hintDismissed = true;
+    hintEl.classList.remove('show');
+  }
+  function showHint() {
+    hintDismissed = false;
+    hintEl.classList.add('show');
+  }
+
+  /* ============================================================
+     8 · 声音（默认静音，WebAudio 合成）
+     ============================================================ */
+  var actx = null, soundOn = false;
+  function ensureAudio() {
+    if (actx) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try { actx = new AC(); } catch (err) { actx = null; }
+  }
+  var SCALE = [196.00, 220.00, 261.63, 293.66, 329.63, 392.00, 440.00];
+  function chime(hueDeg) {
+    if (!soundOn) return;
+    ensureAudio();
+    if (!actx) return;
+    if (actx.state === 'suspended') { try { actx.resume(); } catch (err) {} }
+    var idx = Math.max(0, Math.min(SCALE.length - 1, Math.round(hueDeg / 360 * SCALE.length * 0.999)));
+    var f = SCALE[idx];
+    var t = actx.currentTime + 0.01;
+    var g = actx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.07, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.35);
+    var o1 = actx.createOscillator(); o1.type = 'sine'; o1.frequency.value = f;
+    var o2 = actx.createOscillator(); o2.type = 'sine'; o2.frequency.value = f * 2.004;
+    var g2 = actx.createGain(); g2.gain.value = 0.22;
+    o1.connect(g); o2.connect(g2); g2.connect(g);
+    g.connect(actx.destination);
+    o1.start(t); o1.stop(t + 1.4);
+    o2.start(t); o2.stop(t + 1.4);
+  }
+
+  function setSoundUI() {
+    var on = soundOn;
+    var label = on ? '声音：开' : '声音：关';
+    [btnSoundA, btnSoundB].forEach(function (b) {
+      if (!b) return;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.setAttribute('aria-label', label);
+      b.innerHTML = on ? ICON.soundOn : ICON.soundOff;
+    });
+  }
+
+  /* ============================================================
+     9 · 交互
+     ============================================================ */
+  var ICON = {
+    seed: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.15"><path d="M8 1.7 14.3 8 8 14.3 1.7 8Z"/><path d="M8 5v6M5 8h6" opacity=".5"/></svg>',
+    hex: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.15"><path d="M8 1.6 13.6 4.8v6.4L8 14.4 2.4 11.2V4.8Z"/><circle cx="8" cy="8" r="1.5"/></svg>',
+    speed1: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4.5 3.2 11.5 8l-7 4.8Z"/></svg>',
+    speed2: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2.4 3.4 7.4 8l-5 4.6Z"/><path d="M8 3.4 13 8l-5 4.6Z"/></svg>',
+    speed4: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.15"><path d="M1.6 4 4.9 8l-3.3 4Z"/><path d="M5.9 4 9.2 8l-3.3 4Z"/><path d="M10.2 4 13.5 8l-3.3 4Z"/></svg>',
+    pause: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.8 3v10M10.2 3v10"/></svg>',
+    clear: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.15"><path d="M2.8 4.4h10.4M6 4.4V2.8h4v1.6M4.5 4.4l.6 8.6h5.8l.6-8.6"/></svg>',
+    save: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M8 2v7.2M5.3 6.6 8 9.3l2.7-2.7M2.9 11.4v1.7h10.2v-1.7"/></svg>',
+    soundOn: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.15"><path d="M3 6.1h2.2L8.4 3.4v9.2L5.2 9.9H3z"/><path d="M10.7 5.5a3.6 3.6 0 0 1 0 5"/><path d="M12.4 3.9a6 6 0 0 1 0 8.2" opacity=".55"/></svg>',
+    soundOff: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.15"><path d="M3 6.1h2.2L8.4 3.4v9.2L5.2 9.9H3z"/><path d="M10.6 6.2 13.6 9.4M13.6 6.2l-3 3.2" opacity=".8"/></svg>'
+  };
+
+  var btnSeed = document.getElementById('btnSeed');
+  var btnSym = document.getElementById('btnSym');
+  var btnSpeed = document.getElementById('btnSpeed');
+  var btnClear = document.getElementById('btnClear');
+  var btnSave = document.getElementById('btnSave');
+  var btnSoundA = document.getElementById('btnSoundA');
+  var btnSoundB = document.getElementById('btnSoundB');
+
+  // 注入图标
+  btnSeed.querySelector('.ic').innerHTML = ICON.seed;
+  btnSym.querySelector('.ic').innerHTML = ICON.hex;
+  btnSpeed.querySelector('.ic').innerHTML = ICON.speed1;
+  btnClear.querySelector('.ic').innerHTML = ICON.clear;
+  btnSave.querySelector('.ic').innerHTML = ICON.save;
+  setSoundUI();
+
+  var speedIdx = 0;
+  var paused = false;
+
+  function mult() { return paused ? 0 : SPEEDS[speedIdx]; }
+
+  function updateSpeedUI() {
+    var ic = btnSpeed.querySelector('.ic');
+    var bt = btnSpeed.querySelector('.bt');
+    btnSpeed.setAttribute('aria-pressed', paused ? 'true' : 'false');
+    if (paused) {
+      ic.innerHTML = ICON.pause;
+      bt.textContent = '已暂停';
+      btnSpeed.setAttribute('aria-label', '已暂停，点击继续');
+    } else {
+      ic.innerHTML = speedIdx === 0 ? ICON.speed1 : (speedIdx === 1 ? ICON.speed2 : ICON.speed4);
+      bt.textContent = '速度 ×' + SPEEDS[speedIdx];
+      btnSpeed.setAttribute('aria-label', '速度 ×' + SPEEDS[speedIdx] + '，点击加速或暂停');
+    }
+  }
+  updateSpeedUI();
+
+  function cycleSpeed() {
+    if (!paused) {
+      if (speedIdx < SPEEDS.length - 1) speedIdx++;
+      else paused = true;
+    } else {
+      paused = false;
+      speedIdx = 0;
+    }
+    updateSpeedUI();
+  }
+
+  function togglePause() {
+    paused = !paused;
+    updateSpeedUI();
+  }
+
+  /* ---------- 种晶核 / 浇灌 ---------- */
+  function seedAt(gx, gy, fromUser) {
+    var spot = nearestFree(gx, gy, 34);
+    if (!spot) { showToast('这里已长满 · 换个位置'); return false; }
+    var budget = Math.round(3200 + rnd() * 2600);
+    var ringHue;
+
+    // 贴着已有晶体 → 不算新晶核，等于往这株上继续长
+    var nb = nearbyOwner(spot.x, spot.y);
+    if (nb >= 0 && nb < clusters.length) {
+      var t = clusters[nb];
+      t.pending += budget;
+      ringHue = (t.h0 + t.h1) / 2;
+      rings.push({ gx: spot.x + 0.5, gy: spot.y + 0.5, t: performance.now(), h: ringHue });
+      if (rings.length > 8) rings.splice(0, rings.length - 8);
+      if (paused) { paused = false; updateSpeedUI(); }
+      hideHint();
+      chime(ringHue);
+      hudAt = 0;
+      return true;
+    }
+
+    if (clusters.length >= MAX_CLUSTERS) {
+      showToast('容器已满 · 先清空再种');
+      return false;
+    }
+
+    var palIdx = pickPalette(lastPalette);
+    var c = addCluster(spot.x, spot.y, palIdx, budget);
+    ringHue = (PALETTES[palIdx].h0 + PALETTES[palIdx].h1) / 2;
+    rings.push({
+      gx: spot.x + 0.5,
+      gy: spot.y + 0.5,
+      t: performance.now(),
+      h: ringHue
+    });
+    if (rings.length > 8) rings.splice(0, rings.length - 8);
+    if (fromUser) { hideHint(); chime(ringHue); }
+    if (paused) { paused = false; updateSpeedUI(); }
+    glowDirty = true;
+    hudAt = 0;
+    return true;
+  }
+
+  function seedRandom() {
+    var spot = randomFreeSpot();
+    if (!spot) { showToast('容器已满 · 先清空再种'); return; }
+    seedAt(spot.x, spot.y, true);
+  }
+
+  /* ---------- 清空 ---------- */
+  function clearAll(silent) {
+    occ.fill(0);
+    own.fill(0);
+    hue.fill(0);
+    imgData.data.fill(0);
+    cctx.putImageData(imgData, 0, 0);
+    clusters.length = 0;
+    alive.fill(0);
+    rings.length = 0;
+    totalCells = 0;
+    clustersEver = 0;
+    firstSeedAt = 0;
+    gctxTight.clearRect(0, 0, 320, 320);
+    gctxWide.clearRect(0, 0, 160, 160);
+    gctxHalo.clearRect(0, 0, 80, 80);
+    resetBBox();
+    glowDirty = true;
+    hudAt = 0;
+    if (!silent) {
+      showToast('已清空');
+      setTimeout(function () { if (!clusters.length) showHint(); }, 420);
+    }
+  }
+
+  /* ---------- 指针 ---------- */
+  function toGrid(clientX, clientY) {
+    return {
+      x: Math.floor((clientX - vx) / vs * cam.view + (cam.cx - cam.view / 2)),
+      y: Math.floor((clientY - vy) / vs * cam.view + (cam.cy - cam.view / 2))
+    };
+  }
+
+  canvas.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    if (e.clientX < vx || e.clientX > vx + vs || e.clientY < vy || e.clientY > vy + vs) return;
+    var p = toGrid(e.clientX, e.clientY);
+    if (p.x < 0 || p.y < 0 || p.x >= GRID || p.y >= GRID) return;
+    seedAt(p.x, p.y, true);
+  }, { passive: false });
+
+  canvas.addEventListener('pointermove', function (e) {
+    pointer.touch = e.pointerType !== 'mouse';
+    if (pointer.touch) { pointer.on = false; return; }
+    pointer.x = e.clientX;
+    pointer.y = e.clientY;
+    pointer.on = e.clientX >= vx && e.clientX <= vx + vs && e.clientY >= vy && e.clientY <= vy + vs;
+  });
+
+  canvas.addEventListener('pointerleave', function () { pointer.on = false; });
+
+  canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  /* ---------- 按钮 ---------- */
+  // 鼠标点完释放焦点，好让空格键始终回到「暂停 / 继续」
+  function onTap(btn, fn) {
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+      fn(e);
+      if (e.detail > 0) btn.blur();
+    });
+  }
+
+  onTap(btnSeed, function () { seedRandom(); });
+  onTap(btnSym, function () {
+    symOn = !symOn;
+    btnSym.setAttribute('aria-pressed', symOn ? 'true' : 'false');
+    if (symOn) {
+      symmetrizeAll();
+      glowDirty = true;
+      hudAt = 0;
+      showToast('六方晶系 · 开');
+    } else {
+      showToast('六方晶系 · 关');
+    }
+    hideHint();
+  });
+  onTap(btnSpeed, function () { cycleSpeed(); hideHint(); });
+  onTap(btnClear, function () { clearAll(false); hideHint(); });
+  onTap(btnSave, function () { savePNG(); });
+
+  function toggleSound() {
+    soundOn = !soundOn;
+    if (soundOn) { ensureAudio(); if (actx && actx.state === 'suspended') { try { actx.resume(); } catch (err) {} } }
+    setSoundUI();
+    showToast(soundOn ? '声音 · 开' : '声音 · 关');
+  }
+  onTap(btnSoundA, toggleSound);
+  onTap(btnSoundB, toggleSound);
+
+  /* ---------- 键盘 ---------- */
+  window.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = (e.target && e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    var k = e.key;
+    if (k === ' ' || k === 'Spacebar') {
+      if (tag === 'button' || tag === 'a') return;
+      e.preventDefault();
+      togglePause();
+      hideHint();
+    } else if (k === 'n' || k === 'N') { hideHint(); seedRandom(); }
+    else if (k === 's' || k === 'S') { hideHint(); btnSym.click(); }
+    else if (k === 'c' || k === 'C') { hideHint(); clearAll(false); }
+    else if (k === 'p' || k === 'P') { hideHint(); savePNG(); }
+    else if (k === 'm' || k === 'M') { toggleSound(); }
+  });
+
+  /* ============================================================
+     10 · 导出 PNG（2400×2400，角落留生长记录）
+     ============================================================ */
+  function stampFile(d) {
+    return d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + '-' +
+           pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds());
+  }
+  function stampHuman(d) {
+    return d.getFullYear() + '.' + pad2(d.getMonth() + 1) + '.' + pad2(d.getDate()) +
+           ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+  function elapsedText(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    var m = Math.floor(s / 60);
+    return pad2(m) + ':' + pad2(s % 60);
+  }
+
+  function savePNG() {
+    var btn = btnSave;
+    if (btn.classList.contains('is-busy')) return;
+    btn.classList.add('is-busy');
+    var oldLabel = btn.querySelector('.bt').textContent;
+    btn.querySelector('.bt').textContent = '导出中…';
+
+    setTimeout(function () {
+      try {
+        var S = 2400;
+        var ex = document.createElement('canvas');
+        ex.width = S; ex.height = S;
+        var g = ex.getContext('2d');
+
+        g.fillStyle = '#080a0f';
+        g.fillRect(0, 0, S, S);
+
+        var rg = g.createRadialGradient(S * 0.5, S * 0.42, 0, S * 0.5, S * 0.42, S * 0.74);
+        rg.addColorStop(0, 'rgba(21,34,42,0.6)');
+        rg.addColorStop(0.55, 'rgba(11,15,21,0.28)');
+        rg.addColorStop(1, 'rgba(8,10,15,0)');
+        g.fillStyle = rg;
+        g.fillRect(0, 0, S, S);
+
+        var pad = 124;
+        var vs2 = S - pad * 2;
+
+        g.fillStyle = '#0a0e15';
+        g.fillRect(pad, pad, vs2, vs2);
+
+        var vg = g.createRadialGradient(pad + vs2 / 2, pad + vs2 / 2, vs2 * 0.12, pad + vs2 / 2, pad + vs2 / 2, vs2 * 0.8);
+        vg.addColorStop(0, 'rgba(32,48,56,0.16)');
+        vg.addColorStop(0.72, 'rgba(0,0,0,0)');
+        vg.addColorStop(1, 'rgba(0,0,0,0.42)');
+        g.fillStyle = vg;
+        g.fillRect(pad, pad, vs2, vs2);
+
+        if (glowDirty) updateGlow();
+
+        // 按当前取景渲染，裁在容器内
+        var k = vs2 / cam.view;
+        g.save();
+        g.beginPath();
+        g.rect(pad, pad, vs2, vs2);
+        g.clip();
+        g.translate(pad, pad);
+        g.scale(k, k);
+        g.translate(-(cam.cx - cam.view / 2), -(cam.cy - cam.view / 2));
+
+        g.imageSmoothingEnabled = true;
+        g.globalCompositeOperation = 'lighter';
+        g.globalAlpha = 0.30;
+        g.drawImage(gcHalo, -cam.view * 0.10, -cam.view * 0.10, GRID + cam.view * 0.20, GRID + cam.view * 0.20);
+        g.globalAlpha = 0.50;
+        g.drawImage(gcWide, -cam.view * 0.025, -cam.view * 0.025, GRID + cam.view * 0.05, GRID + cam.view * 0.05);
+        g.globalAlpha = 0.34;
+        g.drawImage(gcTight, -cam.view * 0.006, -cam.view * 0.006, GRID + cam.view * 0.012, GRID + cam.view * 0.012);
+        g.globalCompositeOperation = 'source-over';
+        g.globalAlpha = 1;
+
+        g.imageSmoothingEnabled = false;
+        g.drawImage(cc, 0, 0, GRID, GRID);
+
+        g.globalCompositeOperation = 'lighter';
+        g.imageSmoothingEnabled = true;
+        g.globalAlpha = 0.15;
+        g.drawImage(gcTight, -cam.view * 0.002, -cam.view * 0.002, GRID + cam.view * 0.004, GRID + cam.view * 0.004);
+        g.globalCompositeOperation = 'source-over';
+        g.globalAlpha = 1;
+        g.restore();
+
+        // 容器细边 + 四角刻线
+        g.strokeStyle = '#2a3442';
+        g.lineWidth = 2;
+        g.strokeRect(pad + 1, pad + 1, vs2 - 2, vs2 - 2);
+        g.lineWidth = 2;
+        g.beginPath();
+        var cs = [[pad, pad, -1, -1], [pad + vs2, pad, 1, -1], [pad, pad + vs2, -1, 1], [pad + vs2, pad + vs2, 1, 1]];
+        for (var i2 = 0; i2 < 4; i2++) {
+          var cx0 = cs[i2][0], cy0 = cs[i2][1], sx = cs[i2][2], sy = cs[i2][3];
+          g.moveTo(cx0 + sx * 6, cy0 + sy * 6);
+          g.lineTo(cx0 + sx * 26, cy0 + sy * 6);
+          g.moveTo(cx0 + sx * 6, cy0 + sy * 6);
+          g.lineTo(cx0 + sx * 6, cy0 + sy * 26);
+        }
+        g.stroke();
+
+        // 顶部：编号 + 名
+        g.textBaseline = 'alphabetic';
+        g.fillStyle = '#6fb3a8';
+        g.font = '400 19px ' + '"Cascadia Mono","Consolas","Courier New",monospace';
+        g.fillText('N°02', pad + 2, pad - 76);
+        g.fillStyle = '#efe8da';
+        g.font = '600 46px ' + '"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif';
+        g.fillText('晶 园', pad + 2, pad - 26);
+
+        // 右上：作品集
+        g.textAlign = 'right';
+        g.fillStyle = 'rgba(152,161,172,0.9)';
+        g.font = '400 18px ' + '"Cascadia Mono","Consolas","Courier New",monospace';
+        g.fillText('奇珍室 · A CABINET OF CURIOSITIES', pad + vs2 - 2, pad - 32);
+
+        // 底部左：落款
+        g.textAlign = 'left';
+        g.fillStyle = 'rgba(152,161,172,0.95)';
+        g.font = '400 17px ' + '"Cascadia Mono","Consolas","Courier New",monospace';
+        g.fillText('创造 · 2026', pad + 2, pad + vs2 + 62);
+
+        // 彩蛋：角落一行极小的生长记录
+        var now = new Date();
+        var grow = (performance.now() - (firstSeedAt || performance.now())) / 1000;
+        var record = '晶核 ' + clustersEver + ' · 沉积 ' + totalCells + ' 格 · 生长 ' + elapsedText(grow * 1000) + ' · ' + stampHuman(now);
+        g.textAlign = 'right';
+        g.fillStyle = 'rgba(152,161,172,0.62)';
+        g.font = '400 15px ' + '"Cascadia Mono","Consolas","Courier New",monospace';
+        g.fillText(record, pad + vs2 - 2, pad + vs2 + 60);
+
+        var url = ex.toDataURL('image/png');
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = '晶园_' + stampFile(now) + '.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        showToast('已保存 · 2400 × 2400 PNG');
+      } catch (err) {
+        showToast('导出失败 · 请重试');
+      }
+      btn.classList.remove('is-busy');
+      btn.querySelector('.bt').textContent = oldLabel;
+      updateSpeedUI();
+    }, 40);
+  }
+
+  /* ============================================================
+     11 · 主循环
+     ============================================================ */
+  var lastNow = 0;
+  function frame(now) {
+    window.requestAnimationFrame(frame);
+    if (document.hidden) return;
+    lastNow = now;
+    grow(mult());
+    if (cellDirty) {
+      cctx.putImageData(imgData, 0, 0);
+      glowDirty = true;
+      cellDirty = false;
+    }
+    updateCameraTarget();
+    updateCamera(now);
+    composite(now);
+    updateHUD(now);
+  }
+
+  /* ============================================================
+     12 · 启动
+     ============================================================ */
+  var resizeTimer = 0;
+  window.addEventListener('resize', function () {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(layout, 120);
+  });
+  window.addEventListener('orientationchange', function () {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(layout, 220);
+  });
+
+  layout();
+
+  // 打开即有一簇像样的晶体在缓慢生长（首株取湖青，定调）
+  (function initialSeed() {
+    var cx = Math.round(GRID * 0.5 + (rnd() - 0.5) * 24);
+    var cy = Math.round(GRID * 0.5 + (rnd() - 0.5) * 24);
+    addCluster(cx, cy, 1, PREGROW);
+    pregrow(PREGROW);          // 一次性长到能看清的规模
+    cctx.putImageData(imgData, 0, 0);
+    clusters[0].pending = 4800; // 之后继续分帧生长
+    glowDirty = true;
+    cellDirty = false;
+    updateCameraTarget();
+    cam.cx = camTarget.cx; cam.cy = camTarget.cy; cam.view = camTarget.view;
+    hudAt = 0;
+  })();
+
+  window.requestAnimationFrame(frame);
+
+  // 2 秒后，面板旁出现一行小字（若已经交互过就不再打扰）
+  setTimeout(function () { if (!hintDismissed) showHint(); }, 2000);
+})();
+</script>
+</body>
+</html>

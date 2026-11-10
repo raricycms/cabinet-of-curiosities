@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>预言机 · 奇珍室 N°11</title>
+<link rel="icon" href="data:,">
+<style>
+  :root{
+    --ink-950:#080a0f; --ink-900:#0d1119; --ink-800:#141a24; --line:#2a3442;
+    --paper:#efe8da; --paper-2:#e6ddcc; --text:#e6e2d8; --text-dim:#98a1ac;
+    --verm:#c05b4d; --verm-deep:#8d372d; --amber:#d9a05b; --cyan:#6fb3a8;
+    --serif:"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif;
+    --sans:"Noto Sans SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    --mono:"Cascadia Mono","Consolas","SFMono-Regular",monospace;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--ink-950)}
+  body{min-height:100vh;color:var(--text);font-family:var(--sans);overflow-x:hidden;
+    background:
+      radial-gradient(900px 600px at 50% 0%, rgba(192,91,77,.09), transparent 60%),
+      radial-gradient(900px 700px at 15% 100%, rgba(111,179,168,.05), transparent 60%),
+      var(--ink-950);
+    -webkit-font-smoothing:antialiased}
+  ::selection{background:rgba(192,91,77,.3);color:#fff}
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.035;mix-blend-mode:screen}
+  .grain svg{width:100%;height:100%}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:0 clamp(20px,4vw,44px)}
+  .top{display:flex;justify-content:space-between;align-items:baseline;
+    padding:28px 0 16px;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--text-dim)}
+  .top a{color:var(--text-dim);text-decoration:none;transition:color .3s}
+  .top a:hover{color:var(--verm)}
+
+  .intro{padding:clamp(38px,6vh,64px) 0 clamp(26px,4vh,38px);text-align:center}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;color:var(--verm);
+    display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px}
+  .eyebrow::before,.eyebrow::after{content:"";width:26px;height:1px;background:var(--verm);opacity:.55}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,5.6vw,58px);
+    letter-spacing:.16em;margin:0 0 16px;color:var(--paper);text-indent:.16em}
+  .lede{max-width:36em;margin:0 auto;font-size:14px;line-height:2;color:var(--text-dim);letter-spacing:.02em}
+  .lede em{font-style:normal;color:#c9c3b6;border-bottom:1px solid rgba(192,91,77,.5)}
+
+  /* 问 */
+  .ask{display:flex;gap:10px;max-width:640px;margin:clamp(28px,5vh,46px) auto 0}
+  .ask input{flex:1;background:rgba(20,26,36,.7);border:1px solid var(--line);color:var(--text);
+    font-family:var(--serif);font-size:15px;letter-spacing:.05em;padding:15px 18px;border-radius:1px;
+    outline:none;transition:border-color .3s,background .3s;min-width:0}
+  .ask input::placeholder{color:#69727d;letter-spacing:.06em}
+  .ask input:focus{border-color:rgba(192,91,77,.6);background:rgba(26,20,22,.55)}
+  .ask button{font-family:var(--sans);font-size:13px;letter-spacing:.2em;color:var(--paper);
+    background:rgba(192,91,77,.14);border:1px solid rgba(192,91,77,.55);padding:0 26px;
+    cursor:pointer;border-radius:1px;transition:background .3s,border-color .3s,transform .2s;white-space:nowrap}
+  .ask button:hover{background:rgba(192,91,77,.26);border-color:var(--verm)}
+  .ask button:active{transform:translateY(1px)}
+  .hint{text-align:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+    color:#6f7883;margin:12px 0 0;min-height:16px;transition:color .3s}
+  .hint.warn{color:var(--verm)}
+
+  /* 签筒 */
+  .tube-zone{display:flex;flex-direction:column;align-items:center;margin:clamp(30px,5vh,48px) 0 10px;
+    opacity:1;transition:opacity .5s var(--ease),transform .5s var(--ease)}
+  .tube-zone.hide{opacity:0;transform:translateY(-8px);pointer-events:none;height:0;margin:0;overflow:hidden}
+  .tube{position:relative;width:96px;height:150px;cursor:pointer;transform-origin:50% 92%}
+  .tube .body{position:absolute;inset:26px 0 0 0;border-radius:6px 6px 10px 10px;
+    background:
+      repeating-linear-gradient(90deg,rgba(0,0,0,.22) 0 1px,transparent 1px 9px),
+      linear-gradient(180deg,#5a3a2c,#3b251b 70%,#2c1a13);
+    border:1px solid #241611;
+    box-shadow:inset 0 8px 18px rgba(0,0,0,.55), 0 18px 30px -14px rgba(0,0,0,.9)}
+  .tube .mouth{position:absolute;left:-3px;right:-3px;top:18px;height:18px;border-radius:50%;
+    background:radial-gradient(ellipse at 50% 40%,#1a0f0b,#2e1b13 70%);
+    border:1px solid #241611;box-shadow:inset 0 3px 6px rgba(0,0,0,.7)}
+  .tube .sticks{position:absolute;left:50%;top:0;transform:translateX(-50%);width:64px;height:34px}
+  .tube .sticks i{position:absolute;bottom:0;width:5px;height:30px;border-radius:2px 2px 0 0;
+    background:linear-gradient(180deg,#e9dfcb,#cbbfa6);border:1px solid #b3a68c;
+    box-shadow:0 0 4px rgba(0,0,0,.3)}
+  .tube .sticks i:nth-child(1){left:8px;transform:rotate(-7deg);height:26px}
+  .tube .sticks i:nth-child(2){left:19px;transform:rotate(-2deg);height:32px}
+  .tube .sticks i:nth-child(3){left:30px;transform:rotate(1deg);height:28px}
+  .tube .sticks i:nth-child(4){left:41px;transform:rotate(5deg);height:31px}
+  .tube .sticks i:nth-child(5){left:51px;transform:rotate(9deg);height:25px}
+  .tube .label{position:absolute;left:0;right:0;bottom:26px;text-align:center;
+    font-family:var(--serif);font-size:15px;letter-spacing:.4em;color:#d8c9ae;opacity:.85;
+    writing-mode:vertical-rl;margin:0 auto;height:70px;text-indent:.4em}
+  .tube.shake{animation:shake .55s var(--ease)}
+  @keyframes shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-5deg)}
+    35%{transform:rotate(4.5deg)}55%{transform:rotate(-3deg)}75%{transform:rotate(2deg)}}
+  .tube-cap{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:#6f7883;margin-top:16px}
+  .tube-cap b{color:var(--verm);font-weight:400}
+
+  /* 签 */
+  .result{display:none;margin:0 auto;max-width:940px}
+  .result.show{display:block;animation:fadein .7s var(--ease)}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .slip-row{display:grid;grid-template-columns:200px 1fr;gap:clamp(26px,4vw,54px);align-items:start}
+  .slip{position:relative;background:linear-gradient(165deg,#f4ede0,#e7ddc9 62%,#dbcfb8);
+    border-radius:2px;padding:26px 0 22px;color:#2a241c;
+    box-shadow:0 30px 60px -26px rgba(0,0,0,.9), inset 0 0 0 1px rgba(255,255,255,.25);
+    display:flex;justify-content:center;align-items:center;min-height:420px;
+    transform-origin:50% 100%}
+  .slip::before{content:"";position:absolute;inset:9px;border:1px solid rgba(141,55,45,.35);pointer-events:none}
+  .slip::after{content:"";position:absolute;left:50%;top:0;width:1px;height:100%;
+    background:linear-gradient(180deg,transparent,rgba(120,95,60,.14),transparent);display:none}
+  .poem{writing-mode:vertical-rl;text-orientation:upright;
+    font-family:var(--serif);font-size:17px;line-height:1.92;letter-spacing:.14em;
+    padding:0 6px;display:flex;flex-direction:column;gap:0}
+  .poem span{display:block;opacity:0;transform:translateY(-6px);
+    animation:linein .6s var(--ease) forwards}
+  @keyframes linein{to{opacity:1;transform:none}}
+  .slip-meta{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
+    font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;color:#8a7b62;white-space:nowrap}
+  .slip-no{position:absolute;left:14px;top:16px;font-family:var(--mono);font-size:8px;
+    letter-spacing:.1em;color:#9a8564;writing-mode:vertical-rl}
+
+  .reads{padding-top:6px}
+  .reads .grade{font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--verm);margin-bottom:14px}
+  .reads .q{font-family:var(--serif);font-size:13.5px;line-height:1.9;color:#8f979f;
+    border-left:2px solid var(--line);padding-left:14px;margin-bottom:22px;word-break:break-word}
+  .reads .q b{color:#c9c3b6;font-weight:400}
+  .comment{font-family:var(--serif);font-size:16px;line-height:2.05;color:#dcd6ca;
+    letter-spacing:.03em;margin:0 0 26px;max-width:34em}
+  .sigil-wrap{display:flex;align-items:center;gap:20px;margin-bottom:26px}
+  .sigil{width:118px;height:118px;flex:0 0 auto}
+  .sigil-txt{font-family:var(--mono);font-size:9.5px;line-height:2.1;letter-spacing:.14em;color:#6f7883}
+  .sigil-txt b{color:#a9b0b8;font-weight:400}
+  .acts{display:flex;gap:10px;flex-wrap:wrap}
+  .acts button{font-family:var(--sans);font-size:12px;letter-spacing:.14em;color:var(--text-dim);
+    background:none;border:1px solid var(--line);padding:10px 18px;cursor:pointer;border-radius:1px;
+    transition:border-color .3s,color .3s}
+  .acts button:hover{border-color:rgba(192,91,77,.55);color:var(--paper)}
+
+  /* 签筒历史 */
+  .drawer{margin:clamp(40px,7vh,70px) 0 0;border-top:1px solid var(--line);padding:22px 0 10px}
+  .drawer .dh{display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--text-dim);margin-bottom:16px}
+  .drawer .dh button{background:none;border:none;color:#6f7883;font-family:var(--mono);
+    font-size:10px;letter-spacing:.16em;cursor:pointer;padding:2px 0}
+  .drawer .dh button:hover{color:var(--verm)}
+  .chips{display:flex;gap:9px;flex-wrap:wrap;min-height:34px}
+  .chip{font-family:var(--sans);font-size:11.5px;color:#9aa2ab;background:rgba(20,26,36,.6);
+    border:1px solid var(--line);padding:7px 12px;cursor:pointer;border-radius:1px;
+    max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    transition:border-color .3s,color .3s}
+  .chip:hover{border-color:rgba(192,91,77,.5);color:var(--paper)}
+  .empty{font-family:var(--serif);font-size:12.5px;color:#5f6873;letter-spacing:.04em}
+
+  .foot{margin:clamp(40px,7vh,72px) 0 54px;border-top:1px solid var(--line);padding-top:20px;
+    font-family:var(--mono);font-size:10px;line-height:2.1;letter-spacing:.12em;color:#5f6873;
+    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .foot b{color:#8b949e;font-weight:400}
+
+  @media (max-width:720px){
+    .slip-row{grid-template-columns:1fr;gap:30px}
+    .slip{min-height:380px;max-width:230px;margin:0 auto;width:100%}
+    .poem{font-size:15.5px}
+    .sigil{width:96px;height:96px}
+    .ask{flex-direction:column}
+    .ask button{padding:14px 20px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important;animation-delay:0ms !important;transition-duration:.01ms !important}
+    .poem span{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true">
+  <svg xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <a href="../00_从这里开始.html">← 奇珍室</a>
+    <span>N°11 / 预言机</span>
+  </header>
+
+  <section class="intro">
+    <div class="eyebrow">一件不说话的作品</div>
+    <h1>预言机</h1>
+    <p class="lede">写下此刻你想问的一件事，摇一支签。<br>
+      它不会回答你——它只是把你问的问题，<em>翻译成另一种说法</em>。<br>
+      同一个问题，永远得到同一支签。</p>
+    <form class="ask" id="askForm" autocomplete="off">
+      <input id="q" type="text" maxlength="60" placeholder="此刻，你想问的是……" aria-label="你的问题">
+      <button type="submit">摇 一 签</button>
+    </form>
+    <p class="hint" id="hint">它不联网，也不会把你的问题传到任何地方。</p>
+  </section>
+
+  <div class="tube-zone" id="tubeZone">
+    <div class="tube" id="tube" role="button" tabindex="0" aria-label="摇签筒">
+      <div class="sticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="mouth" aria-hidden="true"></div>
+      <div class="body" aria-hidden="true"></div>
+      <div class="label" aria-hidden="true">预言</div>
+    </div>
+    <div class="tube-cap">点击签筒，或写下你的问题</div>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <div class="slip-row">
+      <div class="slip" id="slip">
+        <div class="slip-no" id="slipNo">第〇〇一签</div>
+        <div class="poem" id="poem"></div>
+        <div class="slip-meta" id="slipMeta">奇珍室 · 预言机</div>
+      </div>
+      <div class="reads">
+        <div class="grade" id="grade">上上签 · 天泽履</div>
+        <div class="q" id="qEcho"></div>
+        <p class="comment" id="comment"></p>
+        <div class="sigil-wrap">
+          <canvas class="sigil" id="sigil" width="236" height="236" aria-label="由你的问题生成的印记"></canvas>
+          <div class="sigil-txt">
+            印 记<br>
+            由问题生成<br>
+            <b id="sigilSeed">—</b>
+          </div>
+        </div>
+        <div class="acts">
+          <button id="again">再摇一次</button>
+          <button id="copy">抄下这一签</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="drawer">
+    <div class="dh"><span>你的签筒 / <span id="cnt">0</span> 支</span><button id="clear">倒空签筒</button></div>
+    <div class="chips" id="chips"><span class="empty">还是空的。摇第一支签吧。</span></div>
+  </section>
+
+  <footer class="foot">
+    <div>预言机不会预测未来。<br><b>它只负责把问题换个说法，还给你自己。</b></div>
+    <div style="text-align:right">问题与签只存在这台电脑的浏览器里<br><b>奇珍室 · 创造 2026</b></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- 二十四支签 ---------- */
+  var SLIPS = [
+    { poem: ["门在墙上，钥匙在水里。","你去捞钥匙的时候，","门自己开了。","里面还是墙。"],
+      grade: "中签 · 泽水困", comment: "你找的东西和你以为的门，不在同一侧。" },
+    { poem: ["雪落在去年的路上。","脚印还在，路没了。","你站的地方，","是明年要下的那场雪。"],
+      grade: "上签 · 山雪履", comment: "先别急着走。路会自己出现，但不会重复。" },
+    { poem: ["一盏灯照不亮两间屋。","你提着它走了很久，","才发现它一直是灭的。","而你早已不需要看路。"],
+      grade: "中签 · 火风鼎", comment: "照亮不是它的用途，陪伴才是。" },
+    { poem: ["河流问石头：你为什么不走。","石头说：我在走，","只是你们用水的速度","量我。"],
+      grade: "上签 · 水地比", comment: "换一把尺子，答案会自己变。" },
+    { poem: ["你数过所有的窗，","却没有一扇是你开的。","风从缝里进来，","告诉你外面在下雨。"],
+      grade: "中签 · 风泽中孚", comment: "有些消息不需要门。" },
+    { poem: ["钟停了。","整条街的时间","都停下来等它。","只有你不知道该不该等。"],
+      grade: "下签 · 雷山小过", comment: "停下来也是一种走法。" },
+    { poem: ["把名字写在纸上，纸会旧。","把名字写在水的形状上，","水会记住——","但没有一个字留下。"],
+      grade: "中签 · 坎为水", comment: "留下和记住，是两件事。" },
+    { poem: ["你养了一盆花，它一直不开。","你搬了三次家，它开了。","开在你没带走的","那个窗台。"],
+      grade: "上签 · 风火家人", comment: "有些结果只属于那个你离开的地方。" },
+    { poem: ["所有的门都朝外开。","你推了很久，","才发现要拉。"],
+      grade: "下签 · 山水蒙", comment: "你缺的不是力气，是方向。" },
+    { poem: ["夜里三点，","城市把声音调小。","你突然听见","自己心跳的节拍器。"],
+      grade: "中签 · 地雷复", comment: "那是你自己的钟，不是别人的。" },
+    { poem: ["你等的那封信，","邮差早就送来了。","你把它当成了账单，","放在抽屉最底下。"],
+      grade: "上签 · 火天大有", comment: "好消息常常长得很普通。" },
+    { poem: ["镜子里的你","比你慢半拍。","你抬手，它才抬。","你笑，它才笑。"],
+      grade: "中签 · 泽山咸", comment: "不必追上它。它只是在替你留着从前。" },
+    { poem: ["桥下没有水，","桥还是桥。","你走过它的时候，","它才成了桥。"],
+      grade: "上签 · 泽地萃", comment: "用处是被经过时才成立的。" },
+    { poem: ["你在纸上画了一个圆，又擦掉。","纸破了。","那个圆","现在在破洞里。"],
+      grade: "下签 · 山地剥", comment: "删掉的东西，会留在删掉的痕迹里。" },
+    { poem: ["一整个冬天，你都在等雪。","雪来了，","你又嫌它冷。"],
+      grade: "中签 · 水雷屯", comment: "愿望实现时，总是带着它的重量。" },
+    { poem: ["两个人各拿一半地图。","拼起来是一张","谁也没去过的","地方。"],
+      grade: "上签 · 风雷益", comment: "关系不是拼图，是两幅不同的地图。" },
+    { poem: ["你把话说了一半。","另一半在喉咙里","长成了一棵树。","每年春天，它开花。"],
+      grade: "中签 · 山风蛊", comment: "没说完的话，会自己找地方长。" },
+    { poem: ["路灯一盏一盏亮起来，","像有人在数数。","数到你的时候，","天亮了。"],
+      grade: "上签 · 地天泰", comment: "你不是被漏掉的那个。" },
+    { poem: ["旧钟表匠说：","坏掉的表","一天也对两次；","好的表，一次也不对。"],
+      grade: "中签 · 火雷噬嗑", comment: "准，不是一直对，是知道什么时候对。" },
+    { poem: ["你翻过一座山，","发现山那边","还是这座山。","但你已经不是爬山前的你。"],
+      grade: "上签 · 山天大畜", comment: "路不会变，走的人会。" },
+    { poem: ["有人在你窗外种了一棵树。","你从未见过他。","树荫落在你桌上，","一落就是十年。"],
+      grade: "上签 · 地风升", comment: "善意常常不署名。" },
+    { poem: ["你把石头扔进井里，","听了很久才听见回声。","井说：我一直在等","有人先开口。"],
+      grade: "中签 · 水风井", comment: "安静不是没有回答。" },
+    { poem: ["雨停了。屋檐还在滴水。","它比雨","多坚持了一会儿。"],
+      grade: "下签 · 天山遁", comment: "余韵才是那件事真正结束的地方。" },
+    { poem: ["最后一支签是空的。","不是没有话，","是话要由你来写。","空，也是一种签。"],
+      grade: "空签 · 未济", comment: "问到最后，问题会变成邀请。" }
+  ];
+
+  /* ---------- 确定性随机 ---------- */
+  function fnv1a(str){
+    var h = 0x811C9DC5, bytes = new TextEncoder().encode(str);
+    for (var i = 0; i < bytes.length; i++){ h ^= bytes[i]; h = Math.imul(h, 0x01000193) >>> 0; }
+    return h >>> 0;
+  }
+  function mulberry32(a){
+    a >>>= 0;
+    return function(){
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), (t | 1)) >>> 0;
+      t = (t ^ ((t + (Math.imul(t ^ (t >>> 7), (t | 61)) >>> 0)) >>> 0)) >>> 0;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  var CN = ["〇","一","二","三","四","五","六","七","八","九"];
+  function cnNum(n){
+    if(n < 10) return CN[n];
+    if(n < 20) return "十" + (n % 10 ? CN[n % 10] : "");
+    return CN[Math.floor(n/10)] + "十" + (n % 10 ? CN[n % 10] : "");
+  }
+  function pad3(n){ return ("00" + n).slice(-3); }
+
+  /* ---------- 印记 ---------- */
+  function drawSigil(canvas, seed){
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height, cx = W/2, cy = H/2;
+    ctx.clearRect(0,0,W,H);
+    var rng = mulberry32(seed);
+    var ink = "#b4473c";
+    ctx.strokeStyle = ink; ctx.fillStyle = ink;
+    var R = W * 0.42;
+    // 双环
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R*0.86, 0, Math.PI*2); ctx.stroke();
+    // 刻度
+    var ticks = 12 + Math.floor(rng()*5)*2;
+    for(var i=0;i<ticks;i++){
+      var a = i/ticks*Math.PI*2 + rng()*0.02;
+      var r1 = R*0.86, r2 = R*(0.90 + (i%2?0.035:0.055));
+      ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r1, cy+Math.sin(a)*r1);
+      ctx.lineTo(cx+Math.cos(a)*r2, cy+Math.sin(a)*r2); ctx.stroke();
+    }
+    // 内接多边形
+    var n = 5 + Math.floor(rng()*4); // 5-8
+    var pts = [];
+    for(var j=0;j<n;j++){
+      var ang = j/n*Math.PI*2 - Math.PI/2 + (rng()-0.5)*0.14;
+      var rad = R*(0.30 + rng()*0.40);
+      pts.push([cx+Math.cos(ang)*rad, cy+Math.sin(ang)*rad]);
+    }
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(var k=0;k<pts.length;k++){ k?ctx.lineTo(pts[k][0],pts[k][1]):ctx.moveTo(pts[k][0],pts[k][1]); }
+    ctx.closePath(); ctx.stroke();
+    // 弦
+    ctx.lineWidth = 1;
+    var chords = 2 + Math.floor(rng()*3);
+    for(var c=0;c<chords;c++){
+      var a1 = Math.floor(rng()*n), a2 = Math.floor(rng()*n);
+      if(a1===a2) continue;
+      ctx.beginPath(); ctx.moveTo(pts[a1][0],pts[a1][1]); ctx.lineTo(pts[a2][0],pts[a2][1]); ctx.stroke();
+    }
+    // 点
+    var dots = 3 + Math.floor(rng()*5);
+    for(var d=0;d<dots;d++){
+      var da = rng()*Math.PI*2, dr = R*(0.42 + rng()*0.40);
+      ctx.beginPath(); ctx.arc(cx+Math.cos(da)*dr, cy+Math.sin(da)*dr, 1.6+rng()*2.2, 0, Math.PI*2); ctx.fill();
+    }
+    // 中心
+    ctx.lineWidth = 2;
+    var cr = R*0.14;
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(rng()*Math.PI);
+    ctx.strokeRect(-cr/2,-cr/2,cr,cr); ctx.restore();
+  }
+
+  /* ---------- DOM ---------- */
+  var $ = function(id){ return document.getElementById(id); };
+  var form = $('askForm'), qInput = $('q'), hint = $('hint');
+  var result = $('result'), poem = $('poem'), slip = $('slip'), slipNo = $('slipNo');
+  var grade = $('grade'), comment = $('comment'), qEcho = $('qEcho');
+  var sigil = $('sigil'), sigilSeed = $('sigilSeed');
+  var chips = $('chips'), cnt = $('cnt'), tube = $('tube'), tubeZone = $('tubeZone');
+  var current = null;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function store(){ try{ return JSON.parse(localStorage.getItem('oracle_slips_v1') || '[]'); }catch(e){ return []; } }
+  function save(list){ try{ localStorage.setItem('oracle_slips_v1', JSON.stringify(list.slice(0,24))); }catch(e){} }
+
+  function renderChips(){
+    var list = store();
+    cnt.textContent = list.length;
+    if(!list.length){ chips.innerHTML = '<span class="empty">还是空的。摇第一支签吧。</span>'; return; }
+    chips.innerHTML = '';
+    list.forEach(function(item){
+      var b = document.createElement('button');
+      b.className = 'chip';
+      b.textContent = '「' + item.q + '」· 第' + cnNum(item.idx + 1) + '签';
+      b.title = item.q;
+      b.addEventListener('click', function(){
+        qInput.value = item.q;
+        reveal(item.q, false);
+      });
+      chips.appendChild(b);
+    });
+  }
+
+  function reveal(question, isNew, forcedIdx){
+    var seed = fnv1a(question);
+    var rng = mulberry32(seed);
+    var idx = (typeof forcedIdx === 'number') ? forcedIdx : Math.floor(rng() * SLIPS.length);
+    var s = SLIPS[idx];
+    current = { q: question, idx: idx };
+
+    // 签条
+    poem.innerHTML = '';
+    s.poem.forEach(function(line, i){
+      var span = document.createElement('span');
+      span.textContent = line;
+      span.style.animationDelay = (reduce ? 0 : 0.14 * i + 0.15) + 's';
+      poem.appendChild(span);
+    });
+    slipNo.textContent = '第' + cnNum(idx + 1) + '签';
+    $('slipMeta').textContent = '奇珍室 · 预言机 · 第' + pad3(idx + 1) + '号';
+    grade.textContent = s.grade;
+    comment.textContent = s.comment;
+    qEcho.innerHTML = '你问：<b></b>';
+    qEcho.querySelector('b').textContent = '「' + question + '」';
+    sigilSeed.textContent = seed.toString(16).toUpperCase().padStart(8, '0');
+    drawSigil(sigil, seed);
+
+    result.classList.remove('show');
+    void result.offsetWidth;
+    result.classList.add('show');
+    tubeZone.classList.add('hide');
+
+    if(isNew){
+      var list = store();
+      list.unshift({ q: question, idx: idx, t: Date.now() });
+      save(list);
+      renderChips();
+    }
+    if(!reduce){
+      try{ result.scrollIntoView({ behavior: 'smooth', block: 'start' }); }catch(e){}
+    }
+  }
+
+  function shakeAndReveal(question){
+    tube.classList.remove('shake');
+    void tube.offsetWidth;
+    tube.classList.add('shake');
+    setTimeout(function(){
+      tube.classList.remove('shake');
+      reveal(question, true);
+    }, reduce ? 0 : 520);
+  }
+
+  function ask(question){
+    question = (question || '').trim();
+    if(!question){
+      hint.textContent = '先写下一件你真正想问的事。随便什么都行。';
+      hint.classList.add('warn');
+      qInput.focus();
+      return;
+    }
+    hint.textContent = '签只由你的问题决定 —— 同一个问题，永远是同一支签。';
+    hint.classList.remove('warn');
+    shakeAndReveal(question);
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    ask(qInput.value);
+  });
+  tube.addEventListener('click', function(){
+    if(qInput.value.trim()){ ask(qInput.value); return; }
+    var ri = Math.floor(Math.random() * SLIPS.length);
+    hint.textContent = '你还没写下问题。这是签筒随手给你的一支。';
+    hint.classList.remove('warn');
+    reveal('（未说出口的问题）', false, ri);
+  });
+  tube.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tube.click(); } });
+
+  $('again').addEventListener('click', function(){
+    qInput.focus(); qInput.select();
+    hint.textContent = '换一个问题，或者把同一个问题再问一次。';
+  });
+  $('copy').addEventListener('click', function(){
+    if(!current) return;
+    var s = SLIPS[current.idx];
+    var text = '《' + s.grade + '》\n' + s.poem.join('\n') + '\n\n批：' + s.comment + '\n\n—— 奇珍室 · 预言机';
+    var done = function(){ hint.textContent = '已抄下。'; hint.classList.remove('warn'); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+    } else { fallbackCopy(text); done(); }
+  });
+  function fallbackCopy(text){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+    }catch(e){}
+  }
+  $('clear').addEventListener('click', function(){
+    save([]); renderChips();
+    result.classList.remove('show');
+    tubeZone.classList.remove('hide');
+    hint.textContent = '签筒空了。从头开始。';
+    hint.classList.remove('warn');
+  });
+
+  renderChips();
+
+  // 如果有上次的记录，不自动展示，只提示
+  if(store().length){
+    hint.textContent = '签筒里有 ' + store().length + ' 支旧签，往下翻可以看到。';
+  }
+})();
+</script>
+</body>
+</html>

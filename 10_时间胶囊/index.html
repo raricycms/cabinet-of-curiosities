@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>时间胶囊 · 奇珍室 N°10</title>
+<link rel="icon" href="data:,">
+<style>
+  :root{
+    --ink-950:#080a0f; --ink-900:#0d1119; --ink-800:#141a24;
+    --line:#2a3442; --paper:#efe8da; --text:#e6e2d8; --text-dim:#98a1ac;
+    --cyan:#6fb3a8; --amber:#d9a05b; --verm:#c05b4d;
+    --serif:"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif;
+    --sans:"Noto Sans SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    --mono:"Cascadia Mono","Consolas","SFMono-Regular",monospace;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--ink-950)}
+  body{min-height:100vh;color:var(--text);font-family:var(--sans);overflow-x:hidden;
+    background:
+      radial-gradient(900px 600px at 50% 18%, rgba(192,91,77,.10), transparent 62%),
+      radial-gradient(1100px 700px at 80% 100%, rgba(111,179,168,.055), transparent 60%),
+      var(--ink-950);
+    -webkit-font-smoothing:antialiased}
+  ::selection{background:rgba(192,91,77,.3);color:#fff}
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.035;mix-blend-mode:screen}
+  .grain svg{width:100%;height:100%}
+
+  .top{position:relative;z-index:2;max-width:1100px;margin:0 auto;
+    padding:30px clamp(20px,4vw,48px) 0;display:flex;justify-content:space-between;
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--text-dim)}
+  .top a{color:var(--text-dim);text-decoration:none;transition:color .3s}
+  .top a:hover{color:var(--cyan)}
+
+  .stage{position:relative;z-index:2;max-width:1100px;margin:0 auto;
+    padding:clamp(30px,5vh,64px) clamp(20px,4vw,48px) 60px;
+    display:flex;flex-direction:column;align-items:center;text-align:center}
+
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .eyebrow::before,.eyebrow::after{content:"";width:26px;height:1px;background:var(--amber);opacity:.6}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,5.6vw,58px);
+    letter-spacing:.14em;margin:0 0 16px;color:var(--paper);text-indent:.14em}
+  .lede{max-width:34em;font-size:14px;line-height:2;color:var(--text-dim);margin:0 0 clamp(34px,6vh,58px);
+    letter-spacing:.02em}
+
+  /* 信封 */
+  .envelope-wrap{position:relative;perspective:900px;margin-bottom:clamp(30px,5vh,48px)}
+  .envelope{position:relative;width:min(440px,80vw);aspect-ratio:1.5/1;
+    background:linear-gradient(160deg,#f4eee1,#e3dac8 62%,#d6ccb8);
+    border-radius:3px;cursor:pointer;transform-style:preserve-3d;
+    box-shadow:0 30px 70px -24px rgba(0,0,0,.85), 0 2px 0 rgba(255,255,255,.06) inset;
+    transition:transform .5s var(--ease), box-shadow .5s var(--ease)}
+  .envelope:hover{transform:translateY(-4px) rotateX(1.2deg);
+    box-shadow:0 40px 90px -26px rgba(0,0,0,.9)}
+  .envelope::after{content:"";position:absolute;inset:0;border-radius:3px;
+    background:linear-gradient(120deg,rgba(0,0,0,.10),transparent 42%,rgba(0,0,0,.06));
+    pointer-events:none}
+  .flap{position:absolute;left:0;top:0;width:100%;height:64%;
+    background:linear-gradient(178deg,#f6f0e4 0%,#e6dccb 55%,#d8cdb7 100%);
+    clip-path:polygon(0 0,100% 0,50% 100%);
+    transform-origin:top center;transition:transform .9s var(--ease);
+    filter:drop-shadow(0 2px 3px rgba(60,45,25,.22))}
+  .envelope.opened .flap{transform:rotateX(-168deg)}
+  .stamp{position:absolute;right:26px;top:20px;width:52px;height:62px;z-index:2;
+    background:linear-gradient(150deg,#f7f1e5,#e8dfcd);transform:rotate(2.5deg);
+    border:1px solid rgba(90,74,50,.42);
+    box-shadow:0 1px 2px rgba(60,45,25,.18);
+    display:grid;place-items:center;overflow:hidden}
+  .stamp::before{content:"";position:absolute;inset:3px;border:1px dashed rgba(90,74,50,.35)}
+  .stamp svg{width:30px;height:30px;color:#8d372d;opacity:.8}
+  .stamp span{position:absolute;bottom:4px;font-family:var(--mono);font-size:6px;
+    letter-spacing:.08em;color:#8a7b62}
+  .addr{position:absolute;left:26px;bottom:22px;z-index:2;width:58%;opacity:.5}
+  .addr i{display:block;height:1px;background:rgba(90,74,50,.30);margin-bottom:9px}
+  .addr i:nth-child(1){width:78%}.addr i:nth-child(2){width:52%}.addr i:nth-child(3){width:64%}
+  .seal{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%) rotate(-6deg);
+    width:74px;height:74px;border-radius:47% 53% 51% 49% / 52% 48% 54% 46%;
+    background:radial-gradient(circle at 34% 30%,#d4736a,#b04a3f 52%,#8d372d 100%);
+    box-shadow:0 6px 14px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.18),
+               inset 0 -6px 12px rgba(0,0,0,.3);
+    display:grid;place-items:center;color:#f6e9df;font-family:var(--serif);font-size:26px;
+    letter-spacing:0;text-shadow:0 1px 0 rgba(0,0,0,.35);transition:box-shadow .4s,transform .4s;
+    z-index:3}
+  .seal::before{content:"";position:absolute;inset:7px;border:1px solid rgba(255,235,225,.35);border-radius:50%}
+  .seal::after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;
+    background:rgba(255,255,255,.16);left:16px;top:14px;filter:blur(1px)}
+  .envelope.shake{animation:shake .5s var(--ease)}
+  @keyframes shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px) rotate(-.6deg)}
+    38%{transform:translateX(6px) rotate(.5deg)}58%{transform:translateX(-4px)}78%{transform:translateX(3px)}}
+  .envelope.denied .seal{box-shadow:0 0 0 6px rgba(192,91,77,.16),0 0 30px rgba(192,91,77,.55),0 6px 14px rgba(0,0,0,.42)}
+  .envelope.denied .seal::before{border-color:rgba(255,235,225,.6)}
+
+  .countdown{display:flex;gap:clamp(16px,3.4vw,42px);align-items:flex-start;margin-bottom:14px}
+  .unit{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .unit .num{font-family:var(--mono);font-size:clamp(30px,4.6vw,44px);line-height:1;
+    color:var(--paper);font-variant-numeric:tabular-nums;letter-spacing:.02em;
+    text-shadow:0 0 24px rgba(239,232,218,.16)}
+  .unit .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.28em;color:var(--text-dim)}
+  .count-cap{font-size:11.5px;letter-spacing:.16em;color:var(--text-dim);margin-bottom:26px}
+  .seal-meta{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#6f7883;
+    line-height:2.1;margin-bottom:26px}
+  .seal-meta b{color:#9aa4af;font-weight:400}
+
+  .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .btn{font-family:var(--sans);font-size:12.5px;letter-spacing:.14em;color:var(--paper);
+    background:transparent;border:1px solid var(--line);padding:12px 26px;cursor:pointer;
+    transition:border-color .3s,color .3s,background .3s;border-radius:1px}
+  .btn:hover{border-color:rgba(217,160,91,.65);color:#f6eee0;background:rgba(217,160,91,.06)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{color:#7d858f;border-color:#202834}
+  .btn.ghost:hover{color:var(--text-dim);border-color:#2f3948;background:none}
+
+  .toast{min-height:52px;margin-top:24px;font-family:var(--serif);font-size:14px;line-height:1.9;
+    color:#c7bdb0;letter-spacing:.03em;max-width:30em;opacity:0;transform:translateY(6px);
+    transition:opacity .5s var(--ease),transform .5s var(--ease)}
+  .toast.show{opacity:1;transform:none}
+  .toast em{font-style:normal;color:var(--amber)}
+
+  .foot-note{margin-top:clamp(46px,8vh,84px);font-family:var(--mono);font-size:10px;
+    letter-spacing:.14em;color:#5f6873;line-height:2;max-width:40em}
+  .foot-note b{color:#8b949e;font-weight:400}
+
+  /* 已启封：信纸 */
+  .letter{position:fixed;inset:0;z-index:20;display:none;overflow-y:auto;
+    background:rgba(6,8,12,.94);backdrop-filter:blur(3px);
+    animation:fadein .8s var(--ease)}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .letter.open{display:block}
+  .sheet{max-width:760px;margin:clamp(28px,6vh,64px) auto;background:
+      linear-gradient(180deg,#f5efe3,#ece4d4);
+    color:#26221c;border-radius:2px;padding:clamp(30px,5vw,64px) clamp(26px,5vw,68px) clamp(40px,6vw,64px);
+    box-shadow:0 40px 100px -30px rgba(0,0,0,.9);
+    position:relative}
+  .sheet::before{content:"";position:absolute;inset:14px;border:1px solid rgba(70,58,40,.20);pointer-events:none}
+  .sheet .h{font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;color:#8a7f6c;
+    display:flex;justify-content:space-between;margin-bottom:26px}
+  .sheet h2{font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:.1em;
+    margin:0 0 26px;color:#2b261e}
+  .sheet .body{font-family:var(--serif);font-size:16.5px;line-height:2.15;
+    letter-spacing:.036em;white-space:pre-wrap;min-height:220px;
+    text-align:justify}
+  .sheet .body::after{content:"▌";color:#b9a888;animation:blink 1s steps(1) infinite}
+  .sheet.done .body::after{display:none}
+  @keyframes blink{50%{opacity:0}}
+  .sheet .sig{text-align:right;margin-top:34px;font-family:var(--serif);font-size:14px;
+    color:#6b6152;letter-spacing:.06em;opacity:0;transition:opacity 1s}
+  .sheet.done .sig{opacity:1}
+  .close{position:fixed;right:26px;top:22px;z-index:21;color:#cfc7b8;background:none;
+    border:1px solid #3a342a;font-family:var(--sans);font-size:12px;letter-spacing:.16em;
+    padding:9px 18px;cursor:pointer;border-radius:1px}
+  .close:hover{border-color:#8a7f6c;color:#fff}
+
+  @media (max-width:560px){
+    .seal{width:62px;height:62px;font-size:22px;top:57%}
+    .countdown{gap:18px}
+    .sheet .body{font-size:15.5px;line-height:2.05}
+    .seal-meta{font-size:9px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true">
+  <svg xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+</div>
+
+<div class="top">
+  <a href="../00_从这里开始.html">← 奇珍室</a>
+  <span>N°10 / 时间胶囊</span>
+</div>
+
+<main class="stage">
+  <div class="eyebrow">一件需要等待的作品</div>
+  <h1>时间胶囊</h1>
+  <p class="lede">这里封着一封写给你的信。内容是加密存放的——不是保险箱，只是一枚诗意的封条。在启封日到来之前，它只是被折叠起来的文字。</p>
+
+  <div class="envelope-wrap">
+    <div class="envelope" id="env" role="button" tabindex="0" aria-label="信封：点击尝试启封">
+      <div class="flap"></div>
+      <div class="stamp" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
+          <circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="9.6"/>
+        </svg>
+        <span>2026</span>
+      </div>
+      <div class="addr" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="seal" aria-hidden="true">封</div>
+    </div>
+  </div>
+
+  <div class="countdown" id="cd" aria-live="polite">
+    <div class="unit"><span class="num" id="d">--</span><span class="lab">DAYS</span></div>
+    <div class="unit"><span class="num" id="h">--</span><span class="lab">HOURS</span></div>
+    <div class="unit"><span class="num" id="m">--</span><span class="lab">MINUTES</span></div>
+    <div class="unit"><span class="num" id="s">--</span><span class="lab">SECONDS</span></div>
+  </div>
+  <div class="count-cap">距启封还有 · 2027.01.01 00:00</div>
+
+  <div class="seal-meta">
+    封印编号 <b>mx9H2xFmDH…</b> &nbsp;·&nbsp; 正文 <b>521</b> 字 &nbsp;·&nbsp; 封存于 <b>2026.11.09</b><br>
+    封条状态 <b>完好</b> &nbsp;·&nbsp; 启封条件 <b>本地时间到达启封日</b>
+  </div>
+
+  <div class="btns">
+    <button class="btn" id="tryOpen">尝 试 启 封</button>
+    <button class="btn ghost" id="why">为什么是 2027 年？</button>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <p class="foot-note">
+    <b>说明</b>　这枚封条不是密码学意义上的保险箱；懂技术的人当然可以拆开它。它只是一份约定：给未来的自己留一点还算新鲜的期待。日期到达后，页面会自动启封，并逐字写出信的内容。
+  </p>
+</main>
+
+<div class="letter" id="letter" aria-hidden="true">
+  <button class="close" id="closeBtn">收 起</button>
+  <article class="sheet" id="sheet">
+    <div class="h"><span>奇珍室 · 时间胶囊</span><span>SEALED 2026.11.09 — OPENED <span id="openDate">2027.01.01</span></span></div>
+    <div class="body" id="letterBody"></div>
+    <div class="sig">一个在三小时里写字的人<br>2026.11.09</div>
+  </article>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TARGET = new Date(2027, 0, 1, 0, 0, 0, 0).getTime(); // 本地时间 2027-01-01 00:00
+  var KEY = "2027-01-01T00:00:00+08:00";
+  var B64 = "mx9H2xFmDHuyDMzPmrkPoVWbFdJVSIzSleLm0epnyS5UrrRCV/tjsp1f8vZPBIuAwCQLuIrw2g5xCmdcRAPbDFGzDS5/UUUl7l5Vuzvytoz+uMjq0gLX25fkgBYcnmmvpJO7EXwA1e5iQKi39hbggaww5qI3pLXGhoFK38vQ3KSopyhnXZIgAqpTeNw8q/UJw3I5yoHO16310hkTOwB2ZCkOv4S1PB7jxJMJZKRFORijsSeBCW7sV6XJBsSIknvnLP6fe1n2R7E578wX3pvgTBzNgLAEmbPFDDLUiJ46AX8+Z3EJ5vhVYdF9rryfRNeG/T9plqPfIXBlFywNxxAwZyiOfsHqbZf6hmxKnsy1RPEgzctNEa9gmUGEabZixjBraXS2tttj2m4Ws8T9gLGtC6vOBXZPVp6Sdx2EJWsv50am1ttrFs50s9kcsbLfQ2zvRkAp29W97vUfw6gZGfsFCIFDXbZjYSsMwXKlgtKS9e4hHtpp/7sftZY9qoiySzAUz4gGavswZATbE6vs7ltqFXuJoRnw1nCzjtuR2h0QnO5dv+txECueF7rOGKtWlasWq5KVbbGobpCG2fA6a4E2dMA/32iCzclraEbRHzdKLJy58pgmtS2/gdANOco1TliCfk6HAkbfF41WqxywD9mPnIXF+MnwAMlMggxNuDJe/MkHNkPxLCiPjPZzE83IFk8FC4rpTywxwIMLSmlF2sOuO5j/MqGDviEIBMu3HATv+1BfANV7aEcGwAUhMwTwZxN7qeXtJoQ7aLyzUCeEl/xuJVLAO5EMSS31lilf+KaQ5ca13j178+hCrA+yu0WOloYaYaXz94Mvr4PoqLXF9pkiQS6cRA+NcdhDeW0ivPe/y+zUeqURQVaWTNQckAUZ1zQUN39aI27P2Qi0x4ttkAu3PZqwsBiRHpbO/uQJn2Gt5fg/B9yTGWn0jDzGMRoI/NXC+fjbNTUJE8qyKxTNzFeP+DfyegxCDZwrn6/71Ma/w/isVoFn7vgwMUDwz2qsrGT23a6YlSuA2pHpcVRN9qPpkZCy4/fPXT8nwuTueh11vVheKryxl7aZ8TW8XCJnwFuOuflEzWnVdTEfES12Fe2AP93kJyNyyKTlG2EK6Drzo4n/kolvtqNHHiHB9E5ii6hW+TlTcwpmNEYlmwLaJZEK+bYOi21Qgc+jMaSZ85Z+K/QVnYEV8riSRy4w6EofOehVtSboZHtvHbE3W+TOX2R1SAxMnElkfOX6aX8wtBaJQqihACb7fDgwrWQM7EOn+gy8X6E4ZoPhIATAhVcDYBOtXG7oby97mFuCFfLtApHJUB8fLUplGg08RijTmnwgOytzc8GkOIeSmL0OxQKZSRW11bOLJg55zaqBDsIOAg32CKRKLwMjIkTq4P9rVTdCm8wFRUMuAuC61iNsX8fSIuJR794DT29ZgR2KENUgTJeQq9t+d3JDu0z+jqZhqiIuV2+2VG1vn+kDLhRbDtfEOrsxQAvSHeHZpD1JEsVBbBfn1b77p2TOa7Nr5EXZW6t5NaSv3He5GN1cX2S+wZ3ia7LoXnusESUCCAtMULLqWsYwMQjb+d0wIsDDXaq+JWaMaxn5cU9J1p49a7X/trycscrKYs/y9Dwuv3og5ud7VSleAFwqPx2HKoX5PnUR1rOruHU1Ky+PlwubKc6ZGjRfrikLUbELfpbwmXt6dqWtuT9sV6hLIvmGjJ3RdkLqpxNGUNevjHVplhnDrhbgXPhdMITaOd2DzOGHOmiSzZ6KQp4Xk6K/aGtSoNaEQmyuh5vi6eiC/oK+lneau6PtqbamaWNAJpVVUcTrr2PYh8KykHBWHrq+f9uCkKU8XSKENKdCsoXOLGCaF+dTRWReIlOdKTUvMScLw8VpdH/dqpkRaUR/qIdVm8Sc2VbQbqHGNp9LtH3+Pf7a/0uXPKTIycV5eMePQFXKDBiqE8AjYON1cXXa/DLpsOhT74PUiv8h6g6cKkHlMSNdYHY=";
+
+  var attempts = 0;
+  var env = document.getElementById('env');
+  var toast = document.getElementById('toast');
+  var letter = document.getElementById('letter');
+  var sheet = document.getElementById('sheet');
+  var body = document.getElementById('letterBody');
+  var dEl=document.getElementById('d'), hEl=document.getElementById('h'),
+      mEl=document.getElementById('m'), sEl=document.getElementById('s');
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function fnv1a(str){
+    var h = 0x811C9DC5, bytes = new TextEncoder().encode(str);
+    for(var i=0;i<bytes.length;i++){ h ^= bytes[i]; h = Math.imul(h, 0x01000193) >>> 0; }
+    return h >>> 0;
+  }
+  function mulberry32(a){
+    a >>>= 0;
+    return function(){
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), (t | 1)) >>> 0;
+      t = (t ^ ((t + (Math.imul(t ^ (t >>> 7), (t | 61)) >>> 0)) >>> 0)) >>> 0;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function decodeLetter(){
+    var raw = atob(B64);
+    var rng = mulberry32(fnv1a(KEY));
+    var out = new Uint8Array(raw.length);
+    for(var i=0;i<raw.length;i++){
+      out[i] = raw.charCodeAt(i) ^ (Math.floor(rng()*256) & 255);
+    }
+    return new TextDecoder('utf-8').decode(out);
+  }
+
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function tick(){
+    var now = Date.now(), left = TARGET - now;
+    if(left <= 0){ openLetter(); return; }
+    var sec = Math.floor(left/1000);
+    dEl.textContent = Math.floor(sec/86400);
+    hEl.textContent = pad(Math.floor(sec%86400/3600));
+    mEl.textContent = pad(Math.floor(sec%3600/60));
+    sEl.textContent = pad(sec%60);
+  }
+
+  var typeTimer = null, opened = false;
+  function openLetter(){
+    if(opened) return;
+    opened = true;
+    clearInterval(tickTimer);
+    try{ localStorage.setItem('cabinet_capsule_opened', String(Date.now())); }catch(e){}
+    env.classList.add('opened');
+    document.getElementById('openDate').textContent = new Date().toLocaleDateString('zh-CN').replace(/\//g,'.');
+    setTimeout(function(){
+      letter.classList.add('open');
+      letter.setAttribute('aria-hidden','false');
+      document.body.style.overflow='hidden';
+      var text = decodeLetter();
+      if(reduced){ body.textContent = text; sheet.classList.add('done'); return; }
+      var i = 0;
+      (function step(){
+        i += 2;
+        body.textContent = text.slice(0,i);
+        if(i < text.length){ typeTimer = setTimeout(step, 16); }
+        else { sheet.classList.add('done'); }
+      })();
+    }, reduced ? 120 : 900);
+  }
+  function closeLetter(){
+    letter.classList.remove('open');
+    letter.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+    if(typeTimer) clearTimeout(typeTimer);
+  }
+
+  var msgs = [
+    '还不到时候。<em>等待也是这件作品的材料之一。</em>',
+    '封条完好。它比你想象的更能等。',
+    '你比大多数人都更想知道里面写了什么。',
+    '再等等。被推迟的东西，读起来会更慢一点。',
+    '如果现在打开，它只是一封信；等到那天打开，它就是一段时间。'
+  ];
+  function deny(){
+    attempts++;
+    env.classList.remove('shake','denied');
+    void env.offsetWidth;
+    env.classList.add('shake','denied');
+    setTimeout(function(){ env.classList.remove('shake'); }, 520);
+    setTimeout(function(){ env.classList.remove('denied'); }, 1400);
+    toast.innerHTML = msgs[Math.min(attempts-1, msgs.length-1)];
+    toast.classList.add('show');
+    clearTimeout(deny._t);
+    deny._t = setTimeout(function(){ toast.classList.remove('show'); }, 4200);
+  }
+
+  var tickTimer = setInterval(tick, 1000);
+  tick();
+
+  env.addEventListener('click', function(){ if(!opened) deny(); });
+  env.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(!opened) deny(); } });
+  document.getElementById('tryOpen').addEventListener('click', function(){ if(!opened) deny(); });
+  document.getElementById('why').addEventListener('click', function(){
+    toast.innerHTML = '因为“三小时”太短了，短到只够写一封短信；<em>而“等一段时间”刚好能把短信变成礼物。</em>';
+    toast.classList.add('show');
+    clearTimeout(deny._t);
+    deny._t = setTimeout(function(){ toast.classList.remove('show'); }, 5200);
+  });
+  document.getElementById('closeBtn').addEventListener('click', closeLetter);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeLetter(); });
+
+  // 若已到启封日，打开页面即自动启封
+  if(Date.now() >= TARGET){ setTimeout(openLetter, 400); }
+})();
+</script>
+</body>
+</html>

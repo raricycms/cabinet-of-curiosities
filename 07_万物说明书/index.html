@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>万物说明书 · 奇珍室 N°07</title>
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#0d1119;color:#e6e2d8;
+ font-family:"Noto Sans SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+ font-size:15px;line-height:1.9;-webkit-font-smoothing:antialiased}
+:root{--ink-950:#080a0f;--ink-900:#0d1119;--ink-800:#141a24;--ink-700:#1e2633;
+ --line:#2a3442;--paper:#efe8da;--text:#e6e2d8;--text-dim:#98a1ac;
+ --cyan:#6fb3a8;--amber:#d9a05b;--verm:#c05b4d;--lilac:#9a8fb8;
+ --accent:#d9a05b;
+ --serif:"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif;
+ --mono:"Cascadia Mono","Consolas","SFMono-Regular",monospace}
+a{color:inherit}
+#prog{position:fixed;top:0;left:0;width:100%;height:2px;background:var(--accent);
+ transform:scaleX(0);transform-origin:0 50%;opacity:.75;z-index:60}
+.back{position:fixed;top:22px;left:26px;z-index:55;text-decoration:none;
+ font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--text-dim);
+ transition:color .25s}
+.back:hover{color:var(--accent)}
+.shell{max-width:1200px;margin:0 auto;padding:0 24px;
+ display:grid;grid-template-columns:236px minmax(0,1fr);gap:72px}
+.side{position:sticky;top:0;height:100vh;overflow-y:auto;padding:100px 0 56px;
+ scrollbar-width:thin}
+.side::-webkit-scrollbar{width:4px}
+.side::-webkit-scrollbar-thumb{background:var(--line)}
+.toc-h{font-family:var(--mono);font-size:10px;letter-spacing:.32em;color:var(--text-dim);
+ margin:0 0 22px}
+.toc-g{margin:0 0 20px}
+.toc-g b{display:block;font-family:var(--serif);font-size:12.5px;font-weight:600;
+ color:var(--paper);letter-spacing:.08em;margin:0 0 8px}
+.toc-g a{display:flex;gap:8px;align-items:baseline;padding:3px 0 3px 10px;
+ border-left:1px solid transparent;font-size:12.5px;color:var(--text-dim);
+ text-decoration:none;transition:color .25s,border-color .25s}
+.toc-g a:hover{color:var(--text)}
+.toc-g a.active{color:var(--accent);border-left-color:var(--accent)}
+.toc-g a i{font-style:normal;font-family:var(--mono);font-size:9.5px;
+ letter-spacing:.08em;opacity:.55;min-width:30px;flex:none}
+main{max-width:760px;padding:100px 0 180px}
+.kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;color:var(--accent)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(38px,5.2vw,58px);
+ line-height:1.16;letter-spacing:.06em;color:var(--paper);margin:20px 0 0}
+.sub{font-family:var(--serif);font-size:clamp(13.5px,1.4vw,15.5px);color:var(--text-dim);
+ margin:16px 0 0;letter-spacing:.04em;line-height:1.9}
+.pre{margin:40px 0 0;padding-left:20px;border-left:1px solid var(--line)}
+.pre p{margin:0 0 6px;font-family:var(--serif);font-size:13.5px;line-height:2.05;color:var(--text-dim)}
+.pre p:last-child{margin-bottom:0}
+.vol{margin-top:92px}
+.vol-h{display:flex;align-items:baseline;gap:16px;padding-bottom:14px;
+ border-bottom:1px solid var(--line);margin:0 0 4px}
+.vol-h h2{font-family:var(--serif);font-size:21px;font-weight:600;margin:0;
+ color:var(--paper);letter-spacing:.1em}
+.vol-h span{font-family:var(--mono);font-size:9.5px;letter-spacing:.26em;color:var(--text-dim)}
+.entry{padding:44px 0 10px;border-top:1px solid var(--line)}
+.vol-h + .entry{border-top:0;padding-top:34px}
+.eh{display:flex;align-items:baseline;gap:14px}
+.eh .no{font-family:var(--serif);font-size:12.5px;color:var(--accent);
+ letter-spacing:.1em;min-width:1.4em;flex:none}
+.eh h3{font-family:var(--serif);font-size:20.5px;font-weight:600;margin:0;
+ color:var(--paper);letter-spacing:.05em}
+.eh .code{margin-left:auto;font-family:var(--mono);font-size:9.5px;
+ letter-spacing:.22em;color:var(--text-dim);flex:none}
+.row{display:grid;grid-template-columns:54px minmax(0,1fr);gap:18px;margin-top:17px}
+.row dt{font-size:10.5px;letter-spacing:.2em;color:var(--text-dim);padding-top:6px}
+.row dd{margin:0;font-family:var(--serif);font-size:15.5px;line-height:2;color:var(--text)}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{text-indent:-2em;padding-left:2em;margin:0 0 7px}
+.steps li:last-child{margin-bottom:0}
+.foot{margin-top:100px;padding-top:26px;border-top:1px solid var(--line);
+ display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+ font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--text-dim)}
+.toc-m{display:none}
+@media (max-width:1023px){
+ .shell{display:block;padding:0 20px}
+ .side{display:none}
+ main{max-width:none;padding:56px 0 120px}
+ .toc-m{display:block;margin:64px 0 0;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line)}
+ .toc-m summary{cursor:pointer;list-style:none;padding:15px 0;font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.26em;color:var(--text-dim)}
+ .toc-m summary::-webkit-details-marker{display:none}
+ .toc-m summary::after{content:"＋";float:right;font-family:var(--sans)}
+ .toc-m[open] summary::after{content:"－"}
+ .toc-m[open] summary{color:var(--accent)}
+ .toc-m .inner{padding:2px 0 22px}
+ .row{grid-template-columns:1fr;gap:6px}
+ .row dt{padding-top:0}
+ .row dd{font-size:15px}
+ .vol{margin-top:64px}
+}
+@media (prefers-reduced-motion:reduce){
+ *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<a class="back" href="../00_从这里开始.html">← 奇珍室</a>
+<div class="shell">
+<aside class="side"><p class="toc-h">目录 · CONTENTS</p><div class="toc-g"><b>卷一 · 借来之物</b><a href="#e1" data-t="e1"><i>01</i><span>备用影子</span></a><a href="#e2" data-t="e2"><i>02</i><span>借来的月光</span></a><a href="#e3" data-t="e3"><i>03</i><span>他人的犹豫</span></a><a href="#e4" data-t="e4"><i>04</i><span>送给陌生人的名字</span></a><a href="#e5" data-t="e5"><i>05</i><span>可以退货的勇气</span></a></div><div class="toc-g"><b>卷二 · 时间之物</b><a href="#e6" data-t="e6"><i>06</i><span>一把只能打开昨天的钥匙</span></a><a href="#e7" data-t="e7"><i>07</i><span>不合时宜的钟</span></a><a href="#e8" data-t="e8"><i>08</i><span>一小时的备用黄昏</span></a><a href="#e9" data-t="e9"><i>09</i><span>保修期内的童年</span></a><a href="#e10" data-t="e10"><i>10</i><span>冬眠中的指南针</span></a></div><div class="toc-g"><b>卷三 · 声与默</b><a href="#e11" data-t="e11"><i>11</i><span>如何折叠一段声音</span></a><a href="#e12" data-t="e12"><i>12</i><span>沉默的计量单位</span></a><a href="#e13" data-t="e13"><i>13</i><span>用来装下沉默的容器</span></a><a href="#e14" data-t="e14"><i>14</i><span>一个房间的回声</span></a><a href="#e15" data-t="e15"><i>15</i><span>一只不会叫的门铃</span></a></div><div class="toc-g"><b>卷四 · 未完成之物</b><a href="#e16" data-t="e16"><i>16</i><span>尚未发生的告别（试用装）</span></a><a href="#e17" data-t="e17"><i>17</i><span>未寄出的信的回信地址</span></a><a href="#e18" data-t="e18"><i>18</i><span>记忆的补漆笔</span></a><a href="#e19" data-t="e19"><i>19</i><span>半句真话（散装）</span></a><a href="#e20" data-t="e20"><i>20</i><span>一场梦的备用零件</span></a></div><div class="toc-g"><b>卷五 · 天气与身体</b><a href="#e21" data-t="e21"><i>21</i><span>一场雨的保养周期</span></a><a href="#e22" data-t="e22"><i>22</i><span>给失眠者的一小片海</span></a><a href="#e23" data-t="e23"><i>23</i><span>反方向的伞</span></a><a href="#e24" data-t="e24"><i>24</i><span>你走之后的那把椅子</span></a><a href="#e25" data-t="e25"><i>25</i><span>这本说明书的读者</span></a></div></aside>
+<main>
+<header>
+<p class="kicker">奇珍室 · N°07</p>
+<h1>万物说明书</h1>
+<p class="sub">关于二十五件不存在的物件，及其使用、保养与保修</p>
+<div class="pre"><p>本书所列之物，均不生产、不销售、不库存。所载方法均为有效方法。</p><p>请在动手之前读完一条，不要跳读：说明书最怕的不是不用，是用到一半。</p></div>
+</header>
+<details class="toc-m"><summary>目录 · 二十五则</summary><div class="inner"><div class="toc-g"><b>卷一 · 借来之物</b><a href="#e1" data-t="e1"><i>01</i><span>备用影子</span></a><a href="#e2" data-t="e2"><i>02</i><span>借来的月光</span></a><a href="#e3" data-t="e3"><i>03</i><span>他人的犹豫</span></a><a href="#e4" data-t="e4"><i>04</i><span>送给陌生人的名字</span></a><a href="#e5" data-t="e5"><i>05</i><span>可以退货的勇气</span></a></div><div class="toc-g"><b>卷二 · 时间之物</b><a href="#e6" data-t="e6"><i>06</i><span>一把只能打开昨天的钥匙</span></a><a href="#e7" data-t="e7"><i>07</i><span>不合时宜的钟</span></a><a href="#e8" data-t="e8"><i>08</i><span>一小时的备用黄昏</span></a><a href="#e9" data-t="e9"><i>09</i><span>保修期内的童年</span></a><a href="#e10" data-t="e10"><i>10</i><span>冬眠中的指南针</span></a></div><div class="toc-g"><b>卷三 · 声与默</b><a href="#e11" data-t="e11"><i>11</i><span>如何折叠一段声音</span></a><a href="#e12" data-t="e12"><i>12</i><span>沉默的计量单位</span></a><a href="#e13" data-t="e13"><i>13</i><span>用来装下沉默的容器</span></a><a href="#e14" data-t="e14"><i>14</i><span>一个房间的回声</span></a><a href="#e15" data-t="e15"><i>15</i><span>一只不会叫的门铃</span></a></div><div class="toc-g"><b>卷四 · 未完成之物</b><a href="#e16" data-t="e16"><i>16</i><span>尚未发生的告别（试用装）</span></a><a href="#e17" data-t="e17"><i>17</i><span>未寄出的信的回信地址</span></a><a href="#e18" data-t="e18"><i>18</i><span>记忆的补漆笔</span></a><a href="#e19" data-t="e19"><i>19</i><span>半句真话（散装）</span></a><a href="#e20" data-t="e20"><i>20</i><span>一场梦的备用零件</span></a></div><div class="toc-g"><b>卷五 · 天气与身体</b><a href="#e21" data-t="e21"><i>21</i><span>一场雨的保养周期</span></a><a href="#e22" data-t="e22"><i>22</i><span>给失眠者的一小片海</span></a><a href="#e23" data-t="e23"><i>23</i><span>反方向的伞</span></a><a href="#e24" data-t="e24"><i>24</i><span>你走之后的那把椅子</span></a><a href="#e25" data-t="e25"><i>25</i><span>这本说明书的读者</span></a></div></div></details>
+<section class="vol" id="v1"><div class="vol-h"><h2>卷一 · 借来之物</h2><span>VOL.01</span></div><section class="entry" id="e1"><div class="eh"><span class="no">一</span><h3>备用影子</h3><span class="code">A-03</span></div><dl><div class="row"><dt>用途</dt><dd>在人暂时没有影子的时候顶上，通常只需要几个小时。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、找一个有太阳的下午，把备用影子从纸筒里倒出来，让它先在地上躺平，摊开，四角压住。</li><li>二、用脚尖踩住它靠近自己的一端，慢慢往回拉，直到它认领你的脚后跟。</li><li>三、站定，等它自己站起来。这一步不要低头看，看了它会重新躺下。</li><li>四、需要收回时，对它说一句无关紧要的话。它会先走开半步，再卷起来。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>备用影子只认一个主人。借给别人用过之后，它回来的头三天会站在离你两步远的地方。</dd></div><div class="row"><dt>保修</dt><dd>自售出之日起，覆盖自然褪色与日食期间的短暂缺失；人为踩踏、外借、以及在正午使用造成的变形，不在保修范围内。</dd></div></dl></section><section class="entry" id="e2"><div class="eh"><span class="no">二</span><h3>借来的月光</h3><span class="code">A-07</span></div><dl><div class="row"><dt>用途</dt><dd>在归还借来的月光时，保证它回到原处、原亮度、原主人。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、把窗台上剩下的月光扫拢，用硬纸板推成一堆。不要用手，手温会让它提前变旧。</li><li>二、称重。借来的月光每晚损耗百分之三，这是允许的，不必补。</li><li>三、装进不透明的布袋，扎紧，在袋口贴一张写着借出日期的纸条。</li><li>四、挑一个没有月亮的夜里归还：放回原处，解开袋口，退后三步，不要看。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>若归还当晚恰好是满月，请改期。两轮月亮碰面时，会有一轮留下来不走。</dd></div><div class="row"><dt>保修</dt><dd>月光本身不设保修。布袋与扎口绳保修一年；人为拉扯导致的漏光，按半价更换。</dd></div></dl></section><section class="entry" id="e3"><div class="eh"><span class="no">三</span><h3>他人的犹豫</h3><span class="code">A-11</span></div><dl><div class="row"><dt>用途</dt><dd>在自己迟迟不能决定的时候，借用别人的犹豫，把时间拖过去。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、找到一个人正在犹豫的时刻——排队时、点菜时、站在两扇门中间时。</li><li>二、不说话，站在他侧后方一米处，等他的犹豫溢出来一点。</li><li>三、用手心接住，不要攥。攥住就变成你自己的了。</li><li>四、需要时摊开手，那股犹豫会替你把“再想想”说出口，语气很像他。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>只能用一次，用完必须还。不还的话，那个人会突然变得果断，而你从此拿不定主意。</dd></div><div class="row"><dt>保修</dt><dd>借用期不超过四十八小时。逾期由本厂代为归还，并收取一次尴尬作为费用。</dd></div></dl></section><section class="entry" id="e4"><div class="eh"><span class="no">四</span><h3>送给陌生人的名字</h3><span class="code">A-16</span></div><dl><div class="row"><dt>用途</dt><dd>给一个还不认识的人一个名字，使他在你这里有个位置。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、选一个不会用在自己身上的名字。不要太合适，太合适会变成真的。</li><li>二、在心里叫三遍，每次都要看着他。</li><li>三、第四遍时，名字会自己找落点——通常是他某个习惯动作。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>名字送出去不能收回。若知道了他的真名，放在旁边，不要替换。</dd></div><div class="row"><dt>保修</dt><dd>本产品不含任何权利。名字被对方知道后即失效。</dd></div></dl></section><section class="entry" id="e5"><div class="eh"><span class="no">五</span><h3>可以退货的勇气</h3><span class="code">A-21</span></div><dl><div class="row"><dt>用途</dt><dd>在需要勇气时借一份来用，事后退还，不必留下。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、拆封。勇气是干的，摸起来像一小块硬纸板，边上有点毛。</li><li>二、出门前含在舌下，不要嚼。嚼了会变得鲁莽，那是另一种东西，不在退换范围内。</li><li>三、说完那句话，它会自己化掉，味道很淡，像铁。</li><li>四、包装留着。七天内可以退，退货时说明用在了哪一件事上。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>只能用于一次发言、一次拒绝、或一次道歉。用于争吵会失效，且不予退换。</dd></div><div class="row"><dt>保修</dt><dd>七天内无理由退货。已使用的勇气请如实申报，本厂不追问原因。</dd></div></dl></section></section><section class="vol" id="v2"><div class="vol-h"><h2>卷二 · 时间之物</h2><span>VOL.02</span></div><section class="entry" id="e6"><div class="eh"><span class="no">六</span><h3>一把只能打开昨天的钥匙</h3><span class="code">B-07</span></div><dl><div class="row"><dt>用途</dt><dd>打开昨天锁上的那一扇门，仅限一扇。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、确认今天的日期。钥匙不认钟点，只认日历；跨过午夜它会变钝。</li><li>二、把钥匙插进任意一把锁里——它只借用锁孔的形状，不借用门。</li><li>三、向左转半圈，听到很轻的一声“咔”。那是昨天在应答，不是锁舌。</li><li>四、推门之前想好要拿什么。你带不出昨天的人，只能带出一件东西。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>门在身后关上时，昨天不会跟着回来。同一把钥匙用第二次，会打开你今天早晨出门的那扇门。</dd></div><div class="row"><dt>保修</dt><dd>齿是一次性的，磨损属正常使用。遗失不予补发——补发的那把，会打开别人的昨天。</dd></div></dl></section><section class="entry" id="e7"><div class="eh"><span class="no">七</span><h3>不合时宜的钟</h3><span class="code">B-11</span></div><dl><div class="row"><dt>用途</dt><dd>在错误的时间响，用来提醒你某件事本来应该发生。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、上弦。它只上得动三圈半，第四圈空转，这是正常的。</li><li>二、把指针拨到你认为它该响的时刻，然后不要管它。</li><li>三、它会自己走，走向那个时刻的错误版本——通常提前十一分钟，或者晚一整天。</li><li>四、响的时候不要立刻去看。先把手上的事做完，再去；去早了，它会把时间还给你。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>不宜与另一台同类的钟放在一屋。它们会商量出一个都不对的时刻，并且互相担保。</dd></div><div class="row"><dt>保修</dt><dd>走时误差不作为质量问题。若钟在搬家后开始准时，说明它已不属于你，请转赠。</dd></div></dl></section><section class="entry" id="e8"><div class="eh"><span class="no">八</span><h3>一小时的备用黄昏</h3><span class="code">B-16</span></div><dl><div class="row"><dt>用途</dt><dd>在白天过长、或夜里来得太早的时候，插入一小时黄昏。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、选一面朝西的墙，把窗帘拉开一半。墙要干净：黄昏会把它照出细小的裂纹，擦不掉。</li><li>二、打开盒子，取出那层薄薄的橙色，抖开，挂在窗框上沿。挂偏了不要重挂，重挂的那次会短二十分钟。</li><li>三、它会自己往下淌，速度约每小时一手掌宽。不要帮它，帮了会淌得太快，淌到一半就没了。</li><li>四、淌到窗台时收起来，叠回原来的大小。叠的时候顺着光的方向；逆着叠，第二天打开是一层灰。</li><li>五、收好的黄昏要竖着放。平放会压出褶，褶在展开时挂在窗上，抹不平。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>只能用一次。用过的会变淡，第二次挂上去只剩灰。</dd></div><div class="row"><dt>保修</dt><dd>橙色褪尽属正常损耗。若黄昏淌到地上仍未收，地板会记住那个颜色，擦不掉。</dd></div></dl></section><section class="entry" id="e9"><div class="eh"><span class="no">九</span><h3>保修期内的童年</h3><span class="code">B-21</span></div><dl><div class="row"><dt>用途</dt><dd>在成年后的某些时刻，短暂返回一段仍在保修期内的童年。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、找出那件东西——一颗玻璃弹珠、一截粉笔、一只掉了漆的铁皮青蛙。要实物，不要照片。</li><li>二、放在手心，握到发热为止，大约三分钟。</li><li>三、松开之前，先想起一个夏天的下午，不要想起人。</li><li>四、松手。你会闻到一点旧气味，持续四到七秒，然后消失。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>每次只能返回四到七秒，不可延长。强行延长，那段童年会提前过完。</dd></div><div class="row"><dt>保修</dt><dd>保修期自你满十八岁那天起算，共十年。逾期可继续使用，但不再修复。</dd></div></dl></section><section class="entry" id="e10"><div class="eh"><span class="no">十</span><h3>冬眠中的指南针</h3><span class="code">B-26</span></div><dl><div class="row"><dt>用途</dt><dd>在方向感丧失的时期，提供一根暂时不动的针。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、不要摇。冬眠中的针是睡着的，摇醒它会乱指三个月。</li><li>二、放在掌心，等它慢慢转过来。它指的通常不是北，是你最近一次觉得踏实的地方。</li><li>三、记住那个方向，收进抽屉。它一年只醒两次，春天和秋天。</li><li>四、要出远门，提前一周把它放在窗边，让它适应。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>冬眠期间不承担导航责任。若针开始发抖，说明附近有它不愿指的东西。</dd></div><div class="row"><dt>保修</dt><dd>针体保修五年。磁场变化导致的失灵，请送原产地校准，运费自理。</dd></div></dl></section></section><section class="vol" id="v3"><div class="vol-h"><h2>卷三 · 声与默</h2><span>VOL.03</span></div><section class="entry" id="e11"><div class="eh"><span class="no">十一</span><h3>如何折叠一段声音</h3><span class="code">C-02</span></div><dl><div class="row"><dt>用途</dt><dd>把一段声音收小，以便携带、暂存，或在必要时重新展开。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、播放录音，在声音最饱满的那一秒按下暂停——折叠要在它有厚度的时候做，薄的段落一折就断。</li><li>二、捏住波形一端，向另一端对折，让两个相同的音节贴在一起。贴不准会错位，错位的声音展开像两个人同时说话。</li><li>三、每折一次，用指腹压住折痕三秒。压轻了弹回来，压重了留下永久的哑。</li><li>四、折到第四折开始漏气，漏出来的通常是背景里的雨。把铁盒挪近接住。</li><li>五、折好的声音放进铁盒，压上一本厚书。声音怕空，盒里要留一点旧空气；没有，它会自己造一个，造出来的往往是你不想听的那段。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>折叠过的声音展开后不会完全一样。人声会晚半拍，鼓点会软。请勿折叠婴儿的第一次笑。</dd></div><div class="row"><dt>保修</dt><dd>折叠服务终身有效，但只保折叠，不保原音。展开后若多出第三个人说话，请停止使用，连盒子一起埋掉。</dd></div></dl></section><section class="entry" id="e12"><div class="eh"><span class="no">十二</span><h3>沉默的计量单位</h3><span class="code">C-06</span></div><dl><div class="row"><dt>用途</dt><dd>度量一段沉默的长短，以便比较，或在谈判中引用。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、以“息”为单位：一次完整的呼吸，从吸到呼，不含停顿。</li><li>二、从对方闭嘴那一瞬开始数，数到有人先开口。</li><li>三、超过三十息的，本说明书统一记为“一段”。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>两个人同时沉默，读数会不一样。这不属于误差，属于立场。</dd></div><div class="row"><dt>保修</dt><dd>结果仅供参考，不作证据使用。因沉默引起的误会，本厂不承担责任。</dd></div></dl></section><section class="entry" id="e13"><div class="eh"><span class="no">十三</span><h3>用来装下沉默的容器</h3><span class="code">C-09</span></div><dl><div class="row"><dt>用途</dt><dd>把一屋子说不出口的话装起来，腾出地方。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、打开盖子，放在桌子中央，人退到墙边。</li><li>二、等。沉默会自己往低处流，约二十分钟装满一半。</li><li>三、快满时盖上盖子，留一指宽的缝，让它喘气。</li><li>四、搬到储藏室，与装满的同类放在一起。不要摇。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>装满后比同体积的水重得多。搬运请两人抬，或者等它自己变轻——通常要等三个月。</dd></div><div class="row"><dt>保修</dt><dd>容器不承压。若盖子在夜里自己弹开，说明里面的东西想出来说话，请勿强行按住。</dd></div></dl></section><section class="entry" id="e14"><div class="eh"><span class="no">十四</span><h3>一个房间的回声</h3><span class="code">C-13</span></div><dl><div class="row"><dt>用途</dt><dd>把一个已经搬空的房间的回声留下来，日后可以再听一次。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、搬走最后一件家具的当天，站在房间正中，说一句平常的话，比如“我走了”。</li><li>二、立刻用毯子把四角捂住，让回声来不及散掉。</li><li>三、把毯子卷起来扎紧，标上房间的名字。回声会在里面待着，偶尔翻身。</li><li>四、想听的时候铺开毯子，站在中间，说同一句话。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>只能保存三年。三年后打开，会听见一个陌生房间的声音。</dd></div><div class="row"><dt>保修</dt><dd>清晰度随保存时间下降，属正常现象。若听见有人应答，请不要回答。</dd></div></dl></section><section class="entry" id="e15"><div class="eh"><span class="no">十五</span><h3>一只不会叫的门铃</h3><span class="code">C-18</span></div><dl><div class="row"><dt>用途</dt><dd>通知屋里的人有人来了，但不发出任何声音。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、按下按钮。门铃会把来客的影子从门缝底下送进去。</li><li>二、屋里的人看见地上多了一个影子，就知道该开门了。</li><li>三、若来客站在背光处没有影子，门铃改送一股气味——通常是他身上最旧那件衣服的味道。</li><li>四、两样都送不进去，说明屋里没人，或者屋里的人不想开。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>不要连按三次以上。第三次之后，送进去的会是你的影子，屋里的人会以为你已经进来了。</dd></div><div class="row"><dt>保修</dt><dd>不响属正常功能。若某天它响了，请立即更换：那说明它认错了门。</dd></div></dl></section></section><section class="vol" id="v4"><div class="vol-h"><h2>卷四 · 未完成之物</h2><span>VOL.04</span></div><section class="entry" id="e16"><div class="eh"><span class="no">十六</span><h3>尚未发生的告别（试用装）</h3><span class="code">D-04</span></div><dl><div class="row"><dt>用途</dt><dd>提前练习一次告别，以免真正发生时说不出话。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、撕开试用装，取出里面那句话。它很短，通常不超过七个字。</li><li>二、对着空椅子说一遍。声音不用大，但要说完，不要中途改词。</li><li>三、说完坐着别动，等那股空落落的感觉过去，大约二十分钟。</li><li>四、把空包装折好收起来。它还能用两次，每次效果递减。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>试用装不能替代正式告别。若练习中哭出来，请暂停，等下一次。</dd></div><div class="row"><dt>保修</dt><dd>本试用装不含具体对象，请勿指定真人。指定后即失效，不予退换。</dd></div></dl></section><section class="entry" id="e17"><div class="eh"><span class="no">十七</span><h3>未寄出的信的回信地址</h3><span class="code">D-08</span></div><dl><div class="row"><dt>用途</dt><dd>为那些写好却没有寄出的信，提供一个能收到回信的地址。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、在信封正面写收信人，背面写你自己的名字，不要写地址。</li><li>二、把信放进抽屉最里面，压在别的纸下面，让它以为自己被寄出去了。</li><li>三、等。回信通常在三个月到两年之间到达，形式是一段突然想起的话、一个梦，或某天忽然不想再写了。</li><li>四、收到后不要回信。这条地址只能收，不能发。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>地址不可变更。搬家用旧地址，信会寄到你原来那个房间。</dd></div><div class="row"><dt>保修</dt><dd>长期有效，但不保证一定收到回信。未收到回信，也是一种回信。</dd></div></dl></section><section class="entry" id="e18"><div class="eh"><span class="no">十八</span><h3>记忆的补漆笔</h3><span class="code">D-12</span></div><dl><div class="row"><dt>用途</dt><dd>修补记忆中掉漆的部分，使它在回看时不那么刺眼。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、摇匀。摇的时候要慢，快了会把底下的东西翻上来。</li><li>二、找出那块掉漆的地方——通常是一句话、一个表情，或者一段没有结尾的路。</li><li>三、薄薄涂一层，等干。干了再涂第二层，最多两层。</li><li>四、涂完不要马上回想。放置二十四小时，让新漆与旧漆咬合。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>只能补颜色，补不了形状。缺口太大的地方涂上去，会显得更明显。</dd></div><div class="row"><dt>保修</dt><dd>补过的记忆颜色会略深于原色，属正常现象。若补完后想起原本没有的事，请停止使用。</dd></div></dl></section><section class="entry" id="e19"><div class="eh"><span class="no">十九</span><h3>半句真话（散装）</h3><span class="code">D-17</span></div><dl><div class="row"><dt>用途</dt><dd>在不方便把话说全的时候，提供刚好够用的那半句。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、从袋里取出一句，掂一掂。半句真话比整句轻，但比谎话沉。</li><li>二、说出口时在中间停一下，让听的人自己补完后半句。</li><li>三、对方补的往往是他最愿意相信的那个版本。此时不要纠正。</li><li>四、事后记下原句，存进抽屉。存满七句要对一次，否则会记混。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>不能连用三次以上。连用之后，你会忘记整句怎么说。</dd></div><div class="row"><dt>保修</dt><dd>散装不密封，受潮后可能变成谎话。请存放于干燥处，避免与场面话同放。</dd></div></dl></section><section class="entry" id="e20"><div class="eh"><span class="no">二十</span><h3>一场梦的备用零件</h3><span class="code">D-22</span></div><dl><div class="row"><dt>用途</dt><dd>为反复做同一个梦的人提供替换零件，使梦能继续做下去。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、拆开小盒，里面三样：一扇门、一段走廊、一个转身。按需取用。</li><li>二、梦断的地方通常缺其中一样。放进去时位置要准，门框对齐墙角。</li><li>三、装好当晚就能续上。续上的梦开头有半秒错位，正常。</li><li>四、旧零件收好，不要扔。它会在别的梦里派上用场。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>一套零件只修同一个梦。装上去之后梦变了样，说明你记错了那个梦。</dd></div><div class="row"><dt>保修</dt><dd>按件保修，不保梦的结局。梦见零件本身时，请停用并休息一晚。</dd></div></dl></section></section><section class="vol" id="v5"><div class="vol-h"><h2>卷五 · 天气与身体</h2><span>VOL.05</span></div><section class="entry" id="e21"><div class="eh"><span class="no">二十一</span><h3>一场雨的保养周期</h3><span class="code">E-01</span></div><dl><div class="row"><dt>用途</dt><dd>维持一场雨在下完之后仍然可用。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、雨停后四十分钟内，用宽口容器接住屋檐最后滴下的水。这叫“收尾”；过了时限接到的，是别的东西。</li><li>二、把水倒进深色瓶子，加一小撮尘土，摇匀。没有尘土的雨会认不出自己，认不出就会乱下。</li><li>三、静置七天，每天开盖一次，让它听见外面的天气。阴天开盖要短，晴天可以长些。</li><li>四、第七天尝一点。尝出铁锈味，说明这场雨已经老了，只能用来洗东西；尝出甜味，说明接的时候混进了别家的雨。</li><li>五、存好的雨每年换一次瓶塞。塞子吸味，久了整瓶都是软木。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>保养中的雨不能见光。见光它会以为自己还在下，然后一直下。</dd></div><div class="row"><dt>保修</dt><dd>雨龄超过一年不予保养。暴雨与雷雨须单独送修，费用另计。</dd></div></dl></section><section class="entry" id="e22"><div class="eh"><span class="no">二十二</span><h3>给失眠者的一小片海</h3><span class="code">E-05</span></div><dl><div class="row"><dt>用途</dt><dd>在没有睡意的夜里，提供一小片可以躺进去的海。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、打开罐子，先听。海在罐里是横着的，要等它慢慢立起来，约一分半钟。</li><li>二、把耳朵贴上去，不要用力。用力听见的是自己的血，不是海。</li><li>三、潮水退到第三遍时，把罐子放在枕边，盖子留一条缝。</li><li>四、到天亮还没睡着，不要关罐子。海需要有人看着它退潮。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>本产品不产生睡意，只提供海。连续使用超过十四天，请把罐子放回窗台晒一次太阳。</dd></div><div class="row"><dt>保修</dt><dd>潮声如有中断，属正常现象。海平面下降不予补充，请自行加一点盐。</dd></div></dl></section><section class="entry" id="e23"><div class="eh"><span class="no">二十三</span><h3>反方向的伞</h3><span class="code">E-09</span></div><dl><div class="row"><dt>用途</dt><dd>在雨从下往上落的地方使用。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、撑开。伞面朝下，伞骨朝上。第一次用会觉得拿反了，是对的。</li><li>二、举过头顶，让伞面接住从地面溅起来的雨。</li><li>三、走慢些。走快了伞里会积起一小片水，沉得压手。</li><li>四、到屋檐下收伞，把水倒回地上。倒的时候说一句“还你”。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>不能用来挡从上往下落的雨，会漏。也不要两个人合用——两个人的雨不一样。</dd></div><div class="row"><dt>保修</dt><dd>伞面破损可换。若伞骨开始朝上长，说明它想变回普通的伞，请顺其自然。</dd></div></dl></section><section class="entry" id="e24"><div class="eh"><span class="no">二十四</span><h3>你走之后的那把椅子</h3><span class="code">E-14</span></div><dl><div class="row"><dt>用途</dt><dd>在有人离开之后，安置那把还留着形状的椅子。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、不要马上收起来。让它空着坐三天，这三天它还在等人。</li><li>二、第四天，把椅子转向窗户。扶着椅背慢慢转，别让椅脚刮到地板。</li><li>三、之后可以坐，但第一次要坐满十分钟再起身，让椅子认新的重量。</li><li>四、若某天它自己转回门口，不要转回来。让它朝那儿。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>椅子不会说话，但会记住重量。坐上去觉得空，是正常的，要坐很多次才会好。</dd></div><div class="row"><dt>保修</dt><dd>本产品不承担思念。椅面塌陷可修，椅子的朝向不予调整。</dd></div></dl></section><section class="entry" id="e25"><div class="eh"><span class="no">二十五</span><h3>这本说明书的读者</h3><span class="code">E-25</span></div><dl><div class="row"><dt>用途</dt><dd>在你读到这里、仍然没有找到想要的那一件时，说明这本书该怎么用。</dd></div><div class="row"><dt>操作</dt><dd><ol class="steps"><li>一、合上书。用拇指按住书脊，停三秒，让里面的东西安静下来。</li><li>二、回想你翻开它时想找的是哪一件。通常不是目录里的任何一件。</li><li>三、把那个东西的样子写在最后一页的空白处。不必写全，写你记得的部分。</li><li>四、写完不要回头核对。你要的那件东西，这本书里没有——这一页是给它留的位置。</li></ol></dd></div><div class="row"><dt>注意</dt><dd>本书不提供实物，也不提供替代品。所列各条仅供练习：练习如何对待还没有的东西。</dd></div><div class="row"><dt>保修</dt><dd>本书保修至你不再需要它为止。届时请转赠，不要丢弃。</dd></div></dl></section></section>
+<div class="foot"><span>二十五则 · 约 5,700 字</span><span>奇珍室 · N°07</span></div>
+</main>
+</div>
+<script>
+(function(){
+  var bar=document.getElementById('prog');
+  function upd(){
+    var d=document.documentElement;
+    var max=d.scrollHeight-d.clientHeight;
+    var p=max>0?d.scrollTop/max:0;
+    bar.style.transform='scaleX('+Math.min(1,Math.max(0,p))+')';
+  }
+  window.addEventListener('scroll',upd,{passive:true});
+  window.addEventListener('resize',upd);
+  upd();
+  if(!('IntersectionObserver' in window)){return;}
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting){return;}
+      var id=e.target.id;
+      var all=document.querySelectorAll('.toc-g a');
+      for(var i=0;i<all.length;i++){all[i].classList.remove('active');}
+      var hit=document.querySelectorAll('.toc-g a[data-t="'+id+'"]');
+      for(var j=0;j<hit.length;j++){hit[j].classList.add('active');}
+    });
+  },{rootMargin:'-12% 0px -72% 0px',threshold:0});
+  var entries=document.querySelectorAll('.entry');
+  for(var k=0;k<entries.length;k++){io.observe(entries[k]);}
+})();
+</script>
+</body>
+</html>

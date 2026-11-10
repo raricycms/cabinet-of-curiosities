@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="一片没有边界的水面。移动是风，点击是投石。">
+<link rel="icon" href="data:,">
+<title>涟漪 · N°01 — 奇珍室</title>
+<style>
+  :root{
+    --ink-950:#080a0f; --ink-900:#0d1119; --ink-800:#141a24; --ink-700:#1e2633;
+    --line:#2a3442; --paper:#efe8da; --text:#e6e2d8; --text-dim:#98a1ac;
+    --cyan:#6fb3a8; --amber:#d9a05b;
+    --serif:"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif;
+    --sans:"Noto Sans SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    --mono:"Cascadia Mono","Consolas","SFMono-Regular",monospace;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; padding:0; overflow:hidden; overscroll-behavior:none;
+    background:var(--ink-950); color:var(--text);
+    font-family:var(--sans); -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none; -webkit-user-select:none;
+  }
+  #water{
+    position:fixed; inset:0; display:block; width:100%; height:100%;
+    touch-action:none; cursor:none;
+    background:var(--ink-950);
+  }
+
+  /* ---- 自绘光标：一枚极小的白点 ---- */
+  #dot{
+    position:fixed; left:0; top:0; width:0; height:0; z-index:5;
+    pointer-events:none; will-change:transform; opacity:0;
+    transition:opacity .35s var(--ease);
+  }
+  #dot i{
+    display:block; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%;
+    background:rgba(239,232,218,.82);
+    box-shadow:0 0 14px rgba(111,179,168,.55);
+    transition:transform .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  #dot.press i{transform:scale(2.2); background:rgba(111,179,168,.95); box-shadow:0 0 22px rgba(111,179,168,.7);}
+
+  /* ---- 界面层 ---- */
+  .ui{position:fixed; z-index:10; pointer-events:none;}
+  a{color:inherit; text-decoration:none;}
+
+  #back{
+    top:calc(26px + env(safe-area-inset-top));
+    left:calc(28px + env(safe-area-inset-left));
+    pointer-events:auto;
+    font-size:12.5px; letter-spacing:.16em; color:var(--text-dim);
+    padding:6px 2px; transition:color .3s var(--ease);
+  }
+  #back:hover,#back:focus-visible{color:var(--text); outline:none;}
+  #back span{opacity:.55; margin-right:.5em;}
+
+  #hint{
+    left:50%; top:45%; z-index:9;
+    transform:translate(-50%,-50%) rotate(-1.2deg);
+    text-align:center; opacity:0;
+    animation:hintIn 1s var(--ease) .12s forwards;
+  }
+  #hint .zh{
+    display:block; font-family:var(--serif); font-weight:400;
+    font-size:clamp(15px,1.55vw,19px);
+    letter-spacing:.44em; text-indent:.44em;
+    color:rgba(230,226,216,.66);
+    text-shadow:0 0 30px rgba(111,179,168,.3);
+  }
+  #hint .en{
+    display:block; margin-top:15px; font-family:var(--mono);
+    font-size:9.5px; letter-spacing:.38em; text-indent:.38em;
+    color:rgba(152,161,172,.45);
+  }
+  @keyframes hintIn{
+    from{opacity:0; transform:translate(-50%,-44%) rotate(-1.2deg);}
+    to{opacity:1; transform:translate(-50%,-50%) rotate(-1.2deg);}
+  }
+  #hint.out{
+    animation:none; opacity:0;
+    transform:translate(-50%,-56%) rotate(-1.2deg);
+    transition:opacity .9s var(--ease), transform 1.3s var(--ease);
+  }
+
+  #dock{
+    left:calc(26px + env(safe-area-inset-left));
+    bottom:calc(20px + env(safe-area-inset-bottom));
+    display:flex; align-items:center; gap:9px; pointer-events:auto;
+    height:34px;
+  }
+  #snd{
+    display:grid; place-items:center; width:32px; height:32px; padding:0; margin:0;
+    background:transparent; border:1px solid transparent; border-radius:50%;
+    color:rgba(152,161,172,.85); cursor:pointer;
+    transition:color .3s var(--ease), border-color .3s var(--ease), background .3s var(--ease);
+  }
+  #snd:hover,#snd:focus-visible{color:var(--text); border-color:rgba(42,52,66,.9); outline:none;}
+  #snd svg{display:block;}
+  #snd .wave{opacity:0; transition:opacity .25s var(--ease);}
+  #snd .slash{opacity:1; transition:opacity .25s var(--ease);}
+  #dock.on #snd{color:var(--cyan);}
+  #dock.on #snd .wave{opacity:1;}
+  #dock.on #snd .slash{opacity:0;}
+
+  #vol{
+    -webkit-appearance:none; appearance:none;
+    width:84px; height:24px; background:transparent; cursor:pointer; margin:0; padding:0;
+  }
+  #vol:focus{outline:none;}
+  #vol::-webkit-slider-runnable-track{height:1px; background:rgba(230,226,216,.22);}
+  #vol::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:7px; height:7px; margin-top:-3px; border-radius:50%;
+    background:rgba(230,226,216,.5); transition:background .25s var(--ease);
+  }
+  #dock:hover #vol::-webkit-slider-thumb,#vol:focus::-webkit-slider-thumb{background:var(--cyan);}
+  #vol::-moz-range-track{height:1px; background:rgba(230,226,216,.22);}
+  #vol::-moz-range-thumb{width:7px; height:7px; border:0; border-radius:50%; background:rgba(230,226,216,.5);}
+
+  #sig{
+    right:calc(28px + env(safe-area-inset-right));
+    bottom:calc(24px + env(safe-area-inset-bottom));
+    text-align:right; font-family:var(--mono);
+    font-size:10px; letter-spacing:.2em; line-height:2; color:rgba(152,161,172,.6);
+  }
+  #sig b{display:block; font-weight:400; font-size:9.5px; letter-spacing:.3em; color:rgba(230,226,216,.34);}
+
+  @media (pointer:coarse){
+    #dot{display:none;}
+    #water{cursor:default;}
+  }
+  @media (max-width:560px){
+    #back{top:calc(18px + env(safe-area-inset-top)); left:calc(19px + env(safe-area-inset-left)); font-size:12px;}
+    #dock{left:calc(18px + env(safe-area-inset-left)); bottom:calc(16px + env(safe-area-inset-bottom)); gap:6px;}
+    #sig{right:calc(19px + env(safe-area-inset-right)); bottom:calc(18px + env(safe-area-inset-bottom)); font-size:9px; letter-spacing:.16em;}
+    #vol{width:66px;}
+    #hint{top:44%;}
+    #hint .zh{letter-spacing:.34em; text-indent:.34em;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    #hint{animation-duration:.01s;}
+    #hint.out{transition-duration:.3s;}
+    #dot i{transition:none;}
+  }
+  .nojs{
+    position:fixed; inset:0; display:grid; place-items:center;
+    font-family:var(--serif); font-size:14px; letter-spacing:.2em; color:var(--text-dim);
+  }
+</style>
+</head>
+<body>
+<canvas id="water" aria-label="水面：移动指针带起水痕，点击投下石子并激响一枚泛音"></canvas>
+<div id="dot" aria-hidden="true"><i></i></div>
+
+<a class="ui" id="back" href="../00_从这里开始.html"><span>←</span>奇珍室</a>
+<div class="ui" id="hint"><span class="zh">点一下水面</span><span class="en">move · click</span></div>
+
+<div class="ui" id="dock">
+  <button id="snd" type="button" aria-pressed="false" aria-label="开启声音" title="开启声音（M）">
+    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor"
+         stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3.6 7.6h2.7L9.7 4.5v11L6.3 12.4H3.6z"/>
+      <path class="wave" d="M12.4 7.3a4 4 0 0 1 0 5.4"/>
+      <path class="wave" d="M15.1 5.2a7.2 7.2 0 0 1 0 9.6"/>
+      <path class="slash" d="M3.2 16.8 16.8 3.2"/>
+    </svg>
+  </button>
+  <input id="vol" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="音量">
+</div>
+
+<div class="ui" id="sig">N°01 · 涟漪<b>奇珍室</b></div>
+
+<noscript><div class="nojs">请开启 JavaScript 以观看《涟漪》</div></noscript>
+
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('water');
+  var ctx = canvas.getContext('2d', { alpha: false });
+  var off = document.createElement('canvas');
+  var octx = off.getContext('2d');
+  var hint = document.getElementById('hint');
+  var dot = document.getElementById('dot');
+  var dock = document.getElementById('dock');
+  var sndBtn = document.getElementById('snd');
+  var volEl = document.getElementById('vol');
+
+  /* ------------------------------------------------------------------ *
+   *  偏好：减少动效 / 精细指针
+   * ------------------------------------------------------------------ */
+  var reduce = false, finePointer = true;
+  try {
+    var mqR = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reduce = mqR.matches;
+    if (mqR.addEventListener) mqR.addEventListener('change', function (e) { reduce = e.matches; });
+    var mqP = window.matchMedia('(pointer: fine)');
+    finePointer = mqP.matches;
+  } catch (err) {}
+
+  /* ------------------------------------------------------------------ *
+   *  波动方程参数
+   *      u_next = 2u - u_prev + c²·∇²u
+   * ------------------------------------------------------------------ */
+  var C2 = 0.30;          // 波速平方（二维 CFL 上限 0.5）
+  var DAMP = 0.9993;      // 每子步阻尼
+  var BAND = 7;           // 边缘吸收层宽度（格）
+  var EDGE_DAMP = 0.905;  // 吸收层最外侧每子步衰减
+  var SMOOTH = 0.06;      // 每帧一次轻度扩散，压掉网格尺度的毛刺
+  var NORM = 14;          // 高度梯度 → 法线强度
+  var subSteps = 2;       // 每帧物理子步
+
+  var LX = -0.44, LY = -0.56, LZ = 0.70;          // 光向
+  var t0 = Math.sqrt(LX * LX + LY * LY + LZ * LZ);
+  LX /= t0; LY /= t0; LZ /= t0;
+  var HX = LX, HY = LY, HZ = LZ + 1;              // 半程向量
+  t0 = Math.sqrt(HX * HX + HY * HY + HZ * HZ);
+  HX /= t0; HY /= t0; HZ /= t0;
+
+  /* ------------------------------------------------------------------ *
+   *  网格状态
+   * ------------------------------------------------------------------ */
+  var cssW = 0, cssH = 0, dpr = 1;
+  var GW = 0, GH = 0;
+  var cur = null, prev = null, scratch = null, rowF = null, colF = null;
+  var baseR = null, baseG = null, baseB = null, dith = null;
+  /* 静水层：两层极慢的斜向大浪（周期 15s / 23s），只用 sin/cos 表，逐帧现算 */
+  var ambS1X = null, ambC1X = null, ambS1Y = null, ambC1Y = null;
+  var ambS2X = null, ambC2X = null, ambS2Y = null, ambC2Y = null;
+  var AMB_A1 = 0.26, AMB_A2 = 0.16, AMB_GAIN = 2.2;
+  var AMB_K1X = 0.01, AMB_K1Y = 0.01, AMB_K2X = 0.01, AMB_K2Y = 0.01;
+  var AMB_G1X = 0, AMB_G1Y = 0, AMB_G2X = 0, AMB_G2Y = 0;
+  var imgData = null, u32 = null;
+
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+  /* 铺一块新水面：网格密度按屏幕长边自适应，移动端更稀 */
+  function resize() {
+    var w = Math.max(240, window.innerWidth);
+    var h = Math.max(240, window.innerHeight);
+    if (w === cssW && h === cssH && cur) return;
+    cssW = w; cssH = h;
+
+    dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'medium';
+
+    var long = Math.max(w, h);
+    var target = long > 1000 ? 284 : (long > 640 ? 236 : 176);
+    var cell = Math.max(3, long / target);
+    GW = Math.max(64, Math.round(w / cell));
+    GH = Math.max(64, Math.round(h / cell));
+
+    var n = GW * GH;
+    cur = new Float32Array(n);
+    prev = new Float32Array(n);
+    scratch = new Float32Array(n);
+    rowF = new Float32Array(GH);
+    colF = new Float32Array(GW);
+    baseR = new Float32Array(n);
+    baseG = new Float32Array(n);
+    baseB = new Float32Array(n);
+    dith = new Float32Array(n);
+    ambS1X = new Float32Array(GW); ambC1X = new Float32Array(GW);
+    ambS1Y = new Float32Array(GH); ambC1Y = new Float32Array(GH);
+    ambS2X = new Float32Array(GW); ambC2X = new Float32Array(GW);
+    ambS2Y = new Float32Array(GH); ambC2Y = new Float32Array(GH);
+
+    /* 大浪的波数按屏幕比例取，换尺寸后仍是"大尺度" */
+    AMB_K1X = 6.2831853 / (GW * 0.42);
+    AMB_K1Y = 6.2831853 / (GH * 0.85);
+    AMB_K2X = 6.2831853 / (GW * 0.85);
+    AMB_K2Y = 6.2831853 / (GH * 0.30);
+    AMB_G1X = AMB_A1 * AMB_K1X * AMB_GAIN;
+    AMB_G1Y = AMB_A1 * AMB_K1Y * AMB_GAIN;
+    AMB_G2X = AMB_A2 * AMB_K2X * AMB_GAIN;
+    AMB_G2Y = AMB_A2 * AMB_K2Y * AMB_GAIN;
+    updateAmbient(0);
+
+    var y, x, d;
+    for (y = 0; y < GH; y++) {
+      d = Math.min(y, GH - 1 - y);
+      rowF[y] = d >= BAND ? 1 : EDGE_DAMP + (1 - EDGE_DAMP) * (d / BAND);
+    }
+    for (x = 0; x < GW; x++) {
+      d = Math.min(x, GW - 1 - x);
+      colF[x] = d >= BAND ? 1 : EDGE_DAMP + (1 - EDGE_DAMP) * (d / BAND);
+    }
+
+    /* 底色：极暗的水深径向渐变 #0a1016 → #070a0e，加抖动噪点防色带 */
+    var i = 0;
+    for (y = 0; y < GH; y++) {
+      var yv = y / (GH - 1) - 0.38;
+      for (x = 0; x < GW; x++, i++) {
+        var xv = x / (GW - 1) - 0.42;
+        var d2 = (xv * xv * 1.15 + yv * yv * 1.45) * 1.25;
+        if (d2 > 1) d2 = 1;
+        var vg = 1 - d2;
+        baseR[i] = 7.0 + 3.0 * vg;
+        baseG[i] = 10.0 + 6.0 * vg;
+        baseB[i] = 14.0 + 8.0 * vg;
+        dith[i] = (Math.random() * 2 - 1) * 1.7;
+      }
+    }
+
+    off.width = GW;
+    off.height = GH;
+    imgData = octx.createImageData(GW, GH);
+    u32 = new Uint32Array(imgData.data.buffer);
+
+    /* 外圈永远静止（振幅恒为 0），预填平色 */
+    var er = Math.max(0, Math.min(255, (baseR[0] + 0.5) | 0));
+    var eg = Math.max(0, Math.min(255, (baseG[0] + 0.5) | 0));
+    var eb = Math.max(0, Math.min(255, (baseB[0] + 0.5) | 0));
+    var flat = (0xff000000 | (eb << 16) | (eg << 8) | er) >>> 0;
+    for (x = 0; x < GW; x++) { u32[x] = flat; u32[(GH - 1) * GW + x] = flat; }
+    for (y = 0; y < GH; y++) { u32[y * GW] = flat; u32[y * GW + GW - 1] = flat; }
+
+    /* 换尺寸后轻轻试一下水，别让屏幕看起来是坏的 */
+    if (started) disturb(GW * 0.5, GH * 0.52, 1.0, 4.6);
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  物理：一步差分 + 边缘吸收
+   * ------------------------------------------------------------------ */
+  function step() {
+    var g = GW, h = GH, i, y, end;
+    for (y = 1; y < h - 1; y++) {
+      i = y * g + 1;
+      end = y * g + g - 1;
+      for (; i < end; i++) {
+        var c = cur[i];
+        var v = 2 * c - prev[i] + C2 * (cur[i - 1] + cur[i + 1] + cur[i - g] + cur[i + g] - 4 * c);
+        v *= DAMP;
+        if (v > 8) v = 8; else if (v < -8) v = -8;
+        prev[i] = v;
+      }
+    }
+    var t = cur; cur = prev; prev = t;
+    absorb();
+  }
+
+  function absorb() {
+    var g = GW, h = GH, x, y, f, i, e;
+    for (y = 1; y <= BAND && y < h - 1; y++) {
+      f = rowF[y];
+      if (f >= 1) continue;
+      i = y * g + 1; e = y * g + g - 1;
+      for (; i < e; i++) cur[i] *= f;
+    }
+    for (y = h - 1 - BAND; y < h - 1; y++) {
+      if (y < 1) continue;
+      f = rowF[y];
+      if (f >= 1) continue;
+      i = y * g + 1; e = y * g + g - 1;
+      for (; i < e; i++) cur[i] *= f;
+    }
+    for (x = 1; x <= BAND && x < g - 1; x++) {
+      f = colF[x];
+      if (f >= 1) continue;
+      for (y = BAND + 1; y < h - 1 - BAND; y++) cur[y * g + x] *= f;
+    }
+    for (x = g - 1 - BAND; x < g - 1; x++) {
+      if (x < 1) continue;
+      f = colF[x];
+      if (f >= 1) continue;
+      for (y = BAND + 1; y < h - 1 - BAND; y++) cur[y * g + x] *= f;
+    }
+  }
+
+  /* 一帧一次的轻微扩散：把网格尺度的短波压掉，水面才不会起"毛刺" */
+  function diffuse(s) {
+    var g = GW, h = GH, i, y, end;
+    for (y = 1; y < h - 1; y++) {
+      i = y * g + 1;
+      end = y * g + g - 1;
+      for (; i < end; i++) {
+        scratch[i] = cur[i] + s * (cur[i - 1] + cur[i + 1] + cur[i - g] + cur[i + g] - 4 * cur[i]);
+      }
+    }
+    var t = cur; cur = scratch; scratch = t;
+  }
+
+  /* 投石：同时写入 u 与 u_prev，速度为零的纯位移，波从落点向四面散开 */
+  function disturb(gx, gy, amp, radius) {
+    var r = radius < 1 ? 1 : radius;
+    var x0 = Math.floor(gx - r), x1 = Math.ceil(gx + r);
+    var y0 = Math.floor(gy - r), y1 = Math.ceil(gy + r);
+    if (x0 < 1) x0 = 1;
+    if (y0 < 1) y0 = 1;
+    if (x1 > GW - 2) x1 = GW - 2;
+    if (y1 > GH - 2) y1 = GH - 2;
+    var inv = 1 / (r * r * 0.45);
+    for (var y = y0; y <= y1; y++) {
+      var dy = y - gy, dy2 = dy * dy, row = y * GW;
+      for (var x = x0; x <= x1; x++) {
+        var dx = x - gx;
+        var d2 = (dx * dx + dy2) * inv;
+        if (d2 > 1.2) continue;
+        var v = amp * Math.exp(-d2 * 2.2);
+        var i = row + x;
+        cur[i] += v;
+        prev[i] += v;
+      }
+    }
+  }
+
+  /* 驻波：只写入 u，持续给水面注入速度 */
+  function excite(gx, gy, amp, radius) {
+    var r = radius < 1 ? 1 : radius;
+    var x0 = Math.floor(gx - r), x1 = Math.ceil(gx + r);
+    var y0 = Math.floor(gy - r), y1 = Math.ceil(gy + r);
+    if (x0 < 1) x0 = 1;
+    if (y0 < 1) y0 = 1;
+    if (x1 > GW - 2) x1 = GW - 2;
+    if (y1 > GH - 2) y1 = GH - 2;
+    var inv = 1 / (r * r * 0.45);
+    for (var y = y0; y <= y1; y++) {
+      var dy = y - gy, dy2 = dy * dy, row = y * GW;
+      for (var x = x0; x <= x1; x++) {
+        var dx = x - gx;
+        var d2 = (dx * dx + dy2) * inv;
+        if (d2 > 1.2) continue;
+        cur[row + x] += amp * Math.exp(-d2 * 2.4);
+      }
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  渲染：高度梯度 → 法线 → 明暗 + 轻微色散
+   * ------------------------------------------------------------------ */
+  /* 静水也必须有"水"的证据：两层极慢的大尺度涌动（十几秒一个周期），
+     只参与着色，不进入波动方程，所以不会打扰真实的涟漪 */
+  function updateAmbient(ts) {
+    var w1 = 6.2831853 / 15.0, w2 = 6.2831853 / 23.0;
+    var p1 = w1 * ts, p2 = w2 * ts;
+    var x, y, v;
+    for (x = 0; x < GW; x++) {
+      v = AMB_K1X * x + p1 * 0.85 + 0.4;
+      ambS1X[x] = Math.sin(v); ambC1X[x] = Math.cos(v);
+      v = AMB_K2X * x - p2 * 0.83 + 0.7;
+      ambS2X[x] = Math.sin(v); ambC2X[x] = Math.cos(v);
+    }
+    for (y = 0; y < GH; y++) {
+      v = AMB_K1Y * y - p1 * 0.55 + 1.9;
+      ambS1Y[y] = Math.sin(v); ambC1Y[y] = Math.cos(v);
+      v = AMB_K2Y * y + p2 * 0.61 + 2.4;
+      ambS2Y[y] = Math.sin(v); ambC2Y[y] = Math.cos(v);
+    }
+  }
+
+  function render() {
+    var g = GW, h = GH, x, y, i;
+    for (y = 1; y < h - 1; y++) {
+      var s1y = ambS1Y[y], c1y = ambC1Y[y], s2y = ambS2Y[y], c2y = ambC2Y[y];
+      i = y * g + 1;
+      for (x = 1; x < g - 1; x++, i++) {
+        var s1x = ambS1X[x], c1x = ambC1X[x], s2x = ambS2X[x], c2x = ambC2X[x];
+        var t1 = s1x * c1y + c1x * s1y;          /* 慢浪 1 的高度 */
+        var q1 = c1x * c1y - s1x * s1y;          /* 它的正交项 = 导数 */
+        var t2 = s2x * c2y + c2x * s2y;          /* 慢浪 2 */
+        var q2 = c2x * c2y - s2x * s2y;
+        var e = cur[i] + AMB_A1 * t1 + AMB_A2 * t2;
+        var dx = (cur[i + 1] - cur[i - 1]) * 0.5;
+        var dy = (cur[i + g] - cur[i - g]) * 0.5;
+        /* 低频涌动只做柔光加法，不参与镜面法线，免得看起来像雾 */
+        var adx = AMB_G1X * q1 + AMB_G2X * q2;
+        var ady = AMB_G1Y * q1 + AMB_G2Y * q2;
+        var dAmb = -(adx * LX + ady * LY);
+        if (dAmb < 0) dAmb = 0;
+        var ambL = dAmb * 240;
+        var nx = -dx * NORM, ny = -dy * NORM;
+        var inv = 1 / Math.sqrt(nx * nx + ny * ny + 1);
+        nx *= inv; ny *= inv;
+        var nz = inv;
+
+        var diff = nx * LX + ny * LY + nz * LZ - LZ;
+        if (diff < 0) diff = 0; else diff *= 1.3;
+        var sl = diff * 240;
+
+        var nh = nx * HX + ny * HY + nz * HZ;
+        if (nh < 0.001) nh = 0.001;
+        var broad = nh > 0.55 ? Math.pow(nh, 32) * 0.30 : 0;
+        var sr = 0, sg = 0, sb = 0;
+        if (nh > 0.62) {
+          var p = Math.pow(nh, 90);
+          var fr = p * (1 - p) * 0.5;      /* 高光边缘的红蓝错位：色散 */
+          sr = p - fr * 0.90; if (sr < 0) sr = 0;
+          sg = p - fr * 0.10; if (sg < 0) sg = 0;
+          sb = p - fr * 0.35; if (sb < 0) sb = 0;
+        }
+
+        var d = dith[i];
+        var e6 = e * 6.0;
+        var ir = baseR[i] + e6 + sl * 0.50 + sr * 240 + broad * 160 + d + ambL * 0.48;
+        var ig = baseG[i] + e6 * 1.17 + sl * 0.92 + sg * 250 + broad * 215 + d + ambL * 0.92;
+        var ib = baseB[i] + e6 * 1.27 + sl * 0.86 + sb * 244 + broad * 196 + d + ambL * 0.88;
+
+        var R = ir < 0 ? 0 : ir > 255 ? 255 : (ir + 0.5) | 0;
+        var G = ig < 0 ? 0 : ig > 255 ? 255 : (ig + 0.5) | 0;
+        var B = ib < 0 ? 0 : ib > 255 ? 255 : (ib + 0.5) | 0;
+        u32[i] = (0xff000000 | (B << 16) | (G << 8) | R) >>> 0;
+      }
+    }
+    octx.putImageData(imgData, 0, 0);
+    ctx.drawImage(off, 0, 0, g, h, 0, 0, canvas.width, canvas.height);
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  声音：正弦分音 + 指数衰减 → 低通 → 卷积混响
+   * ------------------------------------------------------------------ */
+  var PENTA = [0, 2, 4, 7, 9];                       /* D 宫五声 */
+  var PARTIALS = [
+    { r: 1.000, a: 1.00, d: 1.00 },
+    { r: 2.004, a: 0.32, d: 0.66 },
+    { r: 3.012, a: 0.14, d: 0.48 },
+    { r: 5.430, a: 0.05, d: 0.34 }
+  ];
+
+  var audio = {
+    ready: false, on: false, vol: 0.7, ctx: null,
+    master: null, dry: null, conv: null, voices: 0
+  };
+  var audioArmed = false;
+
+  function makeIR(c, seconds) {
+    var rate = c.sampleRate;
+    var len = Math.max(64, Math.floor(rate * seconds));
+    var buf = c.createBuffer(2, len, rate);
+    for (var ch = 0; ch < 2; ch++) {
+      var data = buf.getChannelData(ch);
+      var lp = 0;
+      for (var i = 0; i < len; i++) {
+        var t = i / len;
+        lp += 0.34 * ((Math.random() * 2 - 1) - lp);   /* 柔化噪声 = 温暖的尾音 */
+        data[i] = lp * Math.pow(1 - t, 3.0) * (ch ? 0.92 : 1);
+      }
+    }
+    return buf;
+  }
+
+  function initAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    var c;
+    try { c = new AC(); } catch (e) { return false; }
+    audio.ctx = c;
+
+    var master = c.createGain();
+    master.gain.value = 0;
+    var comp = c.createDynamicsCompressor();
+    try {
+      comp.threshold.value = -18;
+      comp.knee.value = 16;
+      comp.ratio.value = 3.5;
+      comp.attack.value = 0.004;
+      comp.release.value = 0.25;
+    } catch (e) {}
+    master.connect(comp);
+    comp.connect(c.destination);
+
+    var dry = c.createGain();
+    dry.gain.value = 0.85;
+    dry.connect(master);
+
+    var conv = null;
+    try {
+      conv = c.createConvolver();
+      conv.buffer = makeIR(c, 2.4);
+      var wet = c.createGain();
+      wet.gain.value = 0.45;
+      conv.connect(wet);
+      wet.connect(master);
+    } catch (e) { conv = null; }
+
+    audio.master = master;
+    audio.dry = dry;
+    audio.conv = conv;
+    audio.ready = true;
+    return true;
+  }
+
+  function applyGain() {
+    if (!audio.ready) return;
+    var g = audio.on ? audio.vol * 0.2 : 0;
+    try {
+      audio.master.gain.setTargetAtTime(g, audio.ctx.currentTime, 0.05);
+    } catch (e) { audio.master.gain.value = g; }
+  }
+
+  function syncUI() {
+    dock.classList.toggle('on', audio.on);
+    sndBtn.setAttribute('aria-pressed', audio.on ? 'true' : 'false');
+    sndBtn.setAttribute('aria-label', audio.on ? '静音' : '开启声音');
+    sndBtn.title = audio.on ? '静音（M）' : '开启声音（M）';
+  }
+
+  function setSound(on) {
+    if (on && !audio.ready && !initAudio()) return;
+    audio.on = !!on;
+    if (audio.on && audio.ctx) {
+      try { audio.ctx.resume(); } catch (e) {}
+    }
+    applyGain();
+    syncUI();
+  }
+
+  function arm() {
+    if (audioArmed) return;
+    audioArmed = true;
+    setSound(true);
+  }
+
+  /* 落点 → 音高：x 走五声音阶三组，y 换八度 */
+  function freqOf(gx, gy) {
+    var xr = clamp01(gx / Math.max(1, GW - 1));
+    var yr = clamp01(gy / Math.max(1, GH - 1));
+    var idx = Math.min(14, Math.floor(xr * 15));
+    var oct = (idx / 5) | 0;
+    var semi = 50 + oct * 12 + PENTA[idx % 5];        /* MIDI：D3 起 */
+    var shift = yr < 0.34 ? 12 : (yr > 0.68 ? -12 : 0);
+    return 440 * Math.pow(2, (semi + shift - 69) / 12);
+  }
+
+  function playNote(gx, gy, strength, durMul) {
+    if (!audio.ready || !audio.on || audio.voices >= 18) return;
+    var c = audio.ctx;
+    if (!c) return;
+    if (c.state === 'suspended') { try { c.resume(); } catch (e) {} }
+    var now = c.currentTime + 0.004;
+
+    var xr = clamp01(gx / Math.max(1, GW - 1));
+    var yr = clamp01(gy / Math.max(1, GH - 1));
+    var f = freqOf(gx, gy);
+    var peak = 0.5 * strength;
+    var decay = Math.max(0.7, Math.min(3.4, 2.3 * Math.pow(146.83 / f, 0.5))) * (durMul || 1);
+    var bright = 900 + 2600 * (1 - yr);
+
+    var out = c.createGain();
+    out.gain.value = 0.55;
+    var filt = c.createBiquadFilter();
+    filt.type = 'lowpass';
+    filt.frequency.value = bright;
+    filt.Q.value = 0.6;
+    filt.connect(out);
+
+    var panner = null;
+    if (c.createStereoPanner) {
+      panner = c.createStereoPanner();
+      panner.pan.value = (xr * 2 - 1) * 0.72;
+      out.connect(panner);
+    }
+    var tail = panner || out;
+    try { tail.connect(audio.dry); tail.connect(audio.conv); } catch (e) {}
+
+    for (var k = 0; k < PARTIALS.length; k++) {
+      var pt = PARTIALS[k];
+      var osc = c.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = f * pt.r;
+      var g = c.createGain();
+      var a = peak * pt.a;
+      var dd = decay * pt.d;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(a, now + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dd);
+      osc.connect(g);
+      g.connect(filt);
+      osc.start(now);
+      osc.stop(now + dd + 0.05);
+    }
+
+    audio.voices++;
+    setTimeout(function () {
+      audio.voices--;
+      try { out.disconnect(); filt.disconnect(); if (panner) panner.disconnect(); } catch (e) {}
+    }, (decay + 0.3) * 1000);
+  }
+
+  /* 驻波的低吟 */
+  function drone(gx, gy) {
+    if (!audio.ready || !audio.on || audio.voices >= 16) return;
+    var c = audio.ctx;
+    var now = c.currentTime + 0.01;
+    var f = freqOf(gx, gy) * 0.5;
+    var g = c.createGain();
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.linearRampToValueAtTime(0.1, now + 0.4);
+    g.gain.setValueAtTime(0.1, now + 2.6);
+    g.gain.exponentialRampToValueAtTime(0.0006, now + 6.4);
+    var filt = c.createBiquadFilter();
+    filt.type = 'lowpass';
+    filt.frequency.value = 820;
+    g.connect(filt);
+    try { filt.connect(audio.dry); filt.connect(audio.conv); } catch (e) {}
+
+    var ratios = [1, 1.006, 2.01];
+    for (var k = 0; k < ratios.length; k++) {
+      var osc = c.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = f * ratios[k];
+      var og = c.createGain();
+      og.gain.value = k === 0 ? 1 : (k === 1 ? 0.55 : 0.16);
+      osc.connect(og);
+      og.connect(g);
+      osc.start(now);
+      osc.stop(now + 6.6);
+    }
+    audio.voices++;
+    setTimeout(function () {
+      audio.voices--;
+      try { g.disconnect(); filt.disconnect(); } catch (e) {}
+    }, 7000);
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  指针
+   * ------------------------------------------------------------------ */
+  var inside = false, interacted = false, started = false;
+  var rectL = 0, rectT = 0;
+  var lastTX = 0, lastTY = 0, lastTrailT = 0, lastNoteT = 0;
+  var lastInteract = (window.performance && performance.now) ? performance.now() : Date.now();
+  var sources = [];
+  var clicks = [];
+  var rainMode = false, rainAt = 0, dewMode = false, dewAt = 0;
+
+  function nowMs() {
+    return (window.performance && performance.now) ? performance.now() : Date.now();
+  }
+
+  function updateRect() {
+    var r = canvas.getBoundingClientRect();
+    rectL = r.left; rectT = r.top;
+  }
+
+  function moveDot(x, y) {
+    if (!finePointer) return;
+    dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+    dot.style.opacity = '1';
+  }
+
+  function hideHint() {
+    if (!hint || hint.getAttribute('data-off') === '1') return;
+    hint.setAttribute('data-off', '1');
+    hint.classList.add('out');
+    setTimeout(function () { hint.style.display = 'none'; }, 1200);
+  }
+
+  function gridX(px) { return clamp01(px / cssW) * (GW - 1); }
+  function gridY(py) { return clamp01(py / cssH) * (GH - 1); }
+
+  function dropStone(px, py) {
+    var gx = gridX(px), gy = gridY(py);
+    disturb(gx, gy, -2.6, 6.4);                        /* 一颗石头压出的凹坑 */
+    playNote(gx, gy, 0.55, 1);
+    registerClick(px, py, gx, gy);
+  }
+
+  function registerClick(px, py, gx, gy) {
+    var t = nowMs();
+    var keep = [];
+    for (var k = 0; k < clicks.length; k++) {
+      var c0 = clicks[k];
+      if (t - c0.t < 5200 && Math.abs(c0.px - px) < 48 && Math.abs(c0.py - py) < 48) keep.push(c0);
+    }
+    keep.push({ px: px, py: py, t: t });
+    clicks = keep;
+    if (clicks.length >= 3) {
+      clicks = [];
+      startResonance(gx, gy);
+    }
+  }
+
+  /* 彩蛋：同一处连点三次 → 驻波 */
+  function startResonance(gx, gy) {
+    if (sources.length >= 3) sources.shift();
+    sources.push({
+      gx: gx, gy: gy, t0: nowMs(),
+      dur: reduce ? 4200 : 6400,
+      phase: Math.PI * 0.5,
+      speed: 0.2,
+      amp: 0.22
+    });
+    drone(gx, gy);
+  }
+
+  canvas.addEventListener('pointermove', function (e) {
+    var x = e.clientX - rectL, y = e.clientY - rectT;
+    if (x < 0 || y < 0 || x > cssW || y > cssH) return;
+    moveDot(x, y);
+    lastInteract = nowMs();
+    if (!inside) { inside = true; lastTX = x; lastTY = y; lastTrailT = 0; }
+
+    var ddx = x - lastTX, ddy = y - lastTY;
+    var dist = Math.sqrt(ddx * ddx + ddy * ddy);
+    var t = nowMs();
+    if (dist > 2.2 && t - lastTrailT > 34) {
+      var gx = gridX(x), gy = gridY(y);
+      disturb(gx, gy, 0.30 + Math.min(0.45, dist * 0.02), 4.2);
+      if (audio.on && t - lastNoteT > 165) {
+        lastNoteT = t;
+        playNote(gx, gy, 0.16, 1.3);
+      }
+      lastTrailT = t;
+      lastTX = x;
+      lastTY = y;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('pointerdown', function (e) {
+    if (e.button !== undefined && e.button > 0) return;
+    e.preventDefault();
+    var x = e.clientX - rectL, y = e.clientY - rectT;
+    inside = true;
+    interacted = true;
+    hideHint();
+    lastInteract = nowMs();
+    lastTX = x; lastTY = y; lastTrailT = 0;
+    moveDot(x, y);
+    dot.classList.add('press');
+    arm();
+    if (!cur) return;
+    dropStone(x, y);
+  }, { passive: false });
+
+  window.addEventListener('pointerup', function () { dot.classList.remove('press'); });
+  window.addEventListener('pointercancel', function () { dot.classList.remove('press'); });
+  canvas.addEventListener('pointerleave', function () {
+    inside = false;
+    dot.style.opacity = '0';
+  });
+
+  canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  sndBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    audioArmed = true;
+    setSound(!audio.on);
+  });
+
+  volEl.addEventListener('input', function () {
+    var v = parseFloat(volEl.value);
+    audio.vol = isNaN(v) ? 0 : clamp01(v);
+    if (!audio.ready) {
+      audioArmed = true;
+      setSound(true);
+    } else if (!audio.on && audio.vol > 0) {
+      audioArmed = true;
+      setSound(true);
+    }
+    applyGain();
+  });
+
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'm' || e.key === 'M') {
+      audioArmed = true;
+      setSound(!audio.on);
+    }
+  });
+
+  /* ------------------------------------------------------------------ *
+   *  落雨（闲置 8 秒后）
+   * ------------------------------------------------------------------ */
+  function rainDrop() {
+    var gx = 6 + Math.random() * (GW - 12);
+    var gy = 6 + Math.random() * (GH - 12);
+    disturb(gx, gy, 0.9 + Math.random() * 0.9, 3.4 + Math.random() * 1.8);
+    if (audio.on && Math.random() < 0.14) playNote(gx, gy, 0.1, 1.2);
+  }
+
+  /* 静置三秒后：水面自己开始零星滴水（比落雨克制得多） */
+  function dewDrop() {
+    var gx = 8 + Math.random() * (GW - 16);
+    var gy = 8 + Math.random() * (GH - 16);
+    disturb(gx, gy, 0.75 + Math.random() * 0.6, 3.8 + Math.random() * 1.4);
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  主循环
+   * ------------------------------------------------------------------ */
+  var lastT = 0, slowCount = 0, raf = 0;
+
+  function frame(now) {
+    raf = window.requestAnimationFrame(frame);
+    var dt = now - lastT;
+    lastT = now;
+    if (dt > 46) {
+      slowCount++;
+      if (slowCount > 30 && subSteps > 1) { subSteps = 1; slowCount = 0; }
+    } else if (slowCount > 0) {
+      slowCount--;
+    }
+
+    for (var s = 0; s < subSteps; s++) {
+      for (var k = 0; k < sources.length; k++) {
+        var src = sources[k];
+        var age = now - src.t0;
+        if (age < 0 || age > src.dur) continue;
+        var prog = age / src.dur;
+        var env = Math.pow(Math.sin(Math.PI * prog), 0.6) * src.amp;
+        src.phase += src.speed;
+        excite(src.gx, src.gy, Math.sin(src.phase) * env, 4.0);
+      }
+      step();
+    }
+    diffuse(SMOOTH);
+    for (var m = sources.length - 1; m >= 0; m--) {
+      if (now - sources[m].t0 > sources[m].dur) sources.splice(m, 1);
+    }
+
+    var idle = now - lastInteract;
+    if (idle > 8000 && !document.hidden) {
+      dewMode = false;
+      if (!rainMode) { rainMode = true; rainAt = now + 400; }
+      if (now >= rainAt) {
+        rainAt = now + (reduce ? 2600 + Math.random() * 3400 : 520 + Math.random() * 820);
+        rainDrop();
+      }
+    } else if (idle > 3000 && !document.hidden) {
+      rainMode = false;
+      if (!dewMode) { dewMode = true; dewAt = now + 500; }
+      if (now >= dewAt) {
+        dewAt = now + (reduce ? 3600 + Math.random() * 3000 : 2100 + Math.random() * 1700);
+        dewDrop();
+      }
+    } else {
+      rainMode = false;
+      dewMode = false;
+    }
+
+    updateAmbient(reduce ? 0 : now * 0.001);
+    render();
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  启动
+   * ------------------------------------------------------------------ */
+  function boot() {
+    resize();
+    updateRect();
+    updateAmbient(0);
+    syncUI();
+    applyGain();
+    started = true;
+    window.requestAnimationFrame(frame);
+
+    /* 开场：若一秒钟内没人动，水面自己落一颗露水，提示"这是水" */
+    var intro = [
+      { t: 900, x: 0.41, y: 0.56, a: 1.6 },
+      { t: 2600, x: 0.63, y: 0.44, a: 1.1 }
+    ];    if (!reduce) {
+      for (var i = 0; i < intro.length; i++) {
+        (function (it) {
+          setTimeout(function () {
+            if (interacted || !GW) return;
+            disturb(GW * it.x, GH * it.y, it.a, 5.6);
+          }, it.t);
+        })(intro[i]);
+      }
+    }
+  }
+
+  var resizeTimer = 0;
+  window.addEventListener('resize', function () {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      resizeTimer = 0;
+      resize();
+      updateRect();
+    }, 160);
+  });
+  window.addEventListener('orientationchange', function () {
+    setTimeout(function () { resize(); updateRect(); }, 320);
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>
+
+

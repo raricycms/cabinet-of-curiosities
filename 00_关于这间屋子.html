@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>关于这间屋子 · 奇珍室</title>
+<link rel="icon" href="data:,">
+<style>
+  :root{
+    --ink-950:#080a0f; --ink-900:#0d1119; --ink-800:#141a24; --ink-700:#1e2633;
+    --line:#2a3442; --paper:#efe8da; --text:#e6e2d8; --text-dim:#98a1ac;
+    --cyan:#6fb3a8; --amber:#d9a05b; --verm:#c05b4d;
+    --serif:"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif;
+    --sans:"Noto Sans SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    --mono:"Cascadia Mono","Consolas","SFMono-Regular",monospace;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--ink-950)}
+  body{min-height:100vh;color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    background:radial-gradient(1000px 600px at 20% -10%, rgba(111,179,168,.07), transparent 60%),
+               radial-gradient(900px 600px at 110% 40%, rgba(217,160,91,.05), transparent 55%),
+               var(--ink-950)}
+  ::selection{background:rgba(111,179,168,.28);color:#fff}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 clamp(20px,4vw,44px)}
+
+  .top{display:flex;justify-content:space-between;align-items:baseline;padding:28px 0 16px;
+    border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;
+    letter-spacing:.18em;color:var(--text-dim)}
+  .top a{color:var(--text-dim);text-decoration:none;transition:color .3s}
+  .top a:hover{color:var(--cyan)}
+
+  .hero{padding:clamp(44px,8vh,86px) 0 clamp(30px,5vh,54px)}
+  .kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;color:var(--amber);
+    display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .kick::before{content:"";width:28px;height:1px;background:var(--amber)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,5.4vw,56px);
+    letter-spacing:.1em;margin:0 0 24px;color:var(--paper);line-height:1.25}
+  .hero p{font-family:var(--serif);font-size:clamp(15px,1.7vw,17.5px);line-height:2.15;
+    color:#c9c6bc;max-width:40em;margin:0 0 14px;letter-spacing:.02em}
+  .hero p em{font-style:normal;color:var(--paper);border-bottom:1px solid rgba(217,160,91,.6)}
+
+  section{padding:clamp(34px,5vh,52px) 0;border-top:1px solid var(--line)}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(22px,3vw,30px);letter-spacing:.08em;
+    margin:0 0 8px;color:var(--paper);display:flex;align-items:baseline;gap:14px}
+  h2 i{font-family:var(--mono);font-style:normal;font-size:10px;letter-spacing:.2em;color:var(--text-dim)}
+  .sub{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--text-dim);margin-bottom:26px}
+  p.body{font-size:14.5px;line-height:2.05;color:#c3c0b6;max-width:46em;margin:0 0 14px;letter-spacing:.01em}
+  a.inline{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(111,179,168,.35)}
+  a.inline:hover{border-color:var(--cyan)}
+
+  .how{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
+  .how div{border:1px solid var(--line);padding:18px 18px 16px;background:rgba(20,26,36,.35)}
+  .how b{display:block;font-family:var(--serif);font-size:16px;color:var(--paper);margin-bottom:8px;font-weight:600}
+  .how span{font-size:12.5px;line-height:1.9;color:var(--text-dim)}
+
+  table{width:100%;border-collapse:collapse;margin-top:6px}
+  th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line);
+    font-size:13px;line-height:1.6;vertical-align:top}
+  th{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--text-dim);font-weight:400}
+  td.n{font-family:var(--mono);font-size:11px;color:var(--text-dim);white-space:nowrap}
+  td a{color:var(--paper);text-decoration:none;font-family:var(--serif);font-size:15px;letter-spacing:.04em}
+  td a:hover{color:var(--cyan)}
+  td.t{color:var(--amber);font-size:11.5px;white-space:nowrap}
+  td.d{color:var(--text-dim);font-size:12.5px}
+
+  .promise{counter-reset:p;margin:0;padding:0;list-style:none}
+  .promise li{position:relative;padding:18px 0 18px 54px;border-bottom:1px solid var(--line)}
+  .promise li:last-child{border-bottom:none}
+  .promise li::before{counter-increment:p;content:counter(p,decimal-leading-zero);
+    position:absolute;left:0;top:22px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.1em;color:var(--amber)}
+  .promise b{display:block;font-family:var(--serif);font-size:16px;color:var(--paper);
+    font-weight:600;margin-bottom:6px;letter-spacing:.04em}
+  .promise span{font-size:13px;line-height:1.95;color:var(--text-dim)}
+
+  .check{font-size:13px;line-height:2.1;color:#b9b5aa;padding-left:18px;margin:0}
+  .check li{margin-bottom:6px}
+  .check b{color:var(--cyan);font-weight:500}
+
+  .files{font-family:var(--mono);font-size:11.5px;line-height:2.2;color:var(--text-dim);
+    background:rgba(20,26,36,.4);border:1px solid var(--line);padding:18px 20px;margin-top:8px;
+    overflow-x:auto;white-space:pre}
+  .files b{color:var(--paper);font-weight:400}
+
+  .note{border-left:2px solid rgba(217,160,91,.5);padding:2px 0 2px 18px;margin:22px 0 0;
+    font-family:var(--serif);font-size:14px;line-height:2;color:#c9c3b6;max-width:40em}
+
+  .rec{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:6px}
+  .rec a{display:block;border:1px solid var(--line);padding:20px 18px;text-decoration:none;
+    transition:border-color .3s,background .3s}
+  .rec a:hover{border-color:rgba(111,179,168,.6);background:rgba(111,179,168,.05)}
+  .rec i{display:block;font-family:var(--mono);font-style:normal;font-size:9.5px;
+    letter-spacing:.24em;color:var(--text-dim);margin-bottom:10px}
+  .rec b{display:block;font-family:var(--serif);font-size:19px;color:var(--paper);
+    letter-spacing:.06em;margin-bottom:6px;font-weight:600}
+  .rec span{font-size:12px;line-height:1.8;color:var(--text-dim)}
+
+  footer{margin-top:clamp(44px,7vh,72px);padding:22px 0 48px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:#5f6873;line-height:2.1}
+  footer b{color:var(--paper);font-weight:400;letter-spacing:.3em}
+
+  @media (max-width:760px){
+    .how,.rec{grid-template-columns:1fr}
+    table{font-size:12px}
+    th:nth-child(3),td.t{display:none}
+    .files{font-size:10.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a href="00_从这里开始.html">← 奇珍室</a>
+    <span>关于这间屋子 / COLOPHON</span>
+  </header>
+
+  <section class="hero">
+    <div class="kick">策展前言</div>
+    <h1>有人把一只空文件夹<br>放在桌上。</h1>
+    <p>他说：给你三个小时，随便创造点什么，只要它<em>值得留下</em>。</p>
+    <p>于是有了这间屋子。十二件展品，跨交互、生成艺术、声音、文学与装置。它们不解释自己——你碰一下，它们就动。</p>
+    <p>全部离线运行，双击即开，没有一件需要网络，没有一件会过期。</p>
+  </section>
+
+  <section>
+    <h2>怎么打开<i>HOW TO OPEN</i></h2>
+    <div class="how">
+      <div><b>双击门户</b><span>打开 <a class="inline" href="00_从这里开始.html">00_从这里开始.html</a>（或目录里的 index.html，会自动跳转）。建议全屏。</span></div>
+      <div><b>随便推开一扇门</b><span>从任意展品开始，没有正确顺序。每页左上角都能回到门户；门户里也有「随手推开一扇门」。</span></div>
+      <div><b>声音默认关闭</b><span>除《三小时》外，所有声音都由你点击后才响。键盘可用 Tab / Enter 浏览。</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>展品目录<i>CATALOGUE</i></h2>
+    <div class="sub">十二件 / 全部离线 / 无一联网</div>
+    <table>
+      <thead><tr><th>编号</th><th>展品</th><th>类型</th><th>你会做什么</th></tr></thead>
+      <tbody>
+        <tr><td class="n">N°01</td><td><a href="01_涟漪/index.html">涟漪</a></td><td class="t">实时物理 · 声音</td><td class="d">点水面，投一颗石子，听它响</td></tr>
+        <tr><td class="n">N°02</td><td><a href="02_晶园/index.html">晶园</a></td><td class="t">生成艺术</td><td class="d">种下晶核，看晶体自己长成花园</td></tr>
+        <tr><td class="n">N°03</td><td><a href="03_造物机/index.html">造物机</a></td><td class="t">程序化生成</td><td class="d">给机器一个种子，得到一只不存在的生物</td></tr>
+        <tr><td class="n">N°04</td><td><a href="04_不存在的图书馆/index.html">不存在的图书馆</a></td><td class="t">程序化文本</td><td class="d">抽出一本从未被写出的书</td></tr>
+        <tr><td class="n">N°05</td><td><a href="05_三小时/index.html">三小时</a></td><td class="t">合成音乐</td><td class="d">听一首把三小时压进三分钟的曲子</td></tr>
+        <tr><td class="n">N°06</td><td><a href="06_星图/index.html">数字星图</a></td><td class="t">生成海报</td><td class="d">看三个由算法构成的夜空</td></tr>
+        <tr><td class="n">N°07</td><td><a href="07_万物说明书/index.html">万物说明书</a></td><td class="t">文学</td><td class="d">读二十五件不存在之物的使用说明</td></tr>
+        <tr><td class="n">N°08</td><td><a href="08_留白/index.html">留白</a></td><td class="t">小说</td><td class="d">读一篇关于"没做完的东西"的小说</td></tr>
+        <tr><td class="n">N°09</td><td><a href="09_字/index.html">字</a></td><td class="t">生成海报</td><td class="d">看两个汉字被当作两种材料</td></tr>
+        <tr><td class="n">N°10</td><td><a href="10_时间胶囊/index.html">时间胶囊</a></td><td class="t">概念装置</td><td class="d">等一封封存至 2027 年的信启封</td></tr>
+        <tr><td class="n">N°11</td><td><a href="11_预言机/index.html">预言机</a></td><td class="t">交互仪式</td><td class="d">写下问题，摇一支签，得到一首诗与一枚印记</td></tr>
+        <tr><td class="n">N°12</td><td><a href="12_回声/index.html">回声</a></td><td class="t">交互文本</td><td class="d">一句话传二十次，最后它成了另一句话</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>它是怎么被做出来的<i>HOW IT WAS MADE</i></h2>
+    <p class="body">全部是手写的原生 HTML / CSS / JavaScript：没有框架、没有构建步骤、没有外部依赖。图形是算出来的，声音是合成出来的，文字是写出来的。</p>
+    <ul class="check">
+      <li>《涟漪》用二维波动方程数值解 + WebAudio 泛音合成；</li>
+      <li>《晶园》用扩散限制聚集（DLA）与自动取景；</li>
+      <li>《造物机》《不存在的图书馆》《预言机》用种子化伪随机数驱动 SVG 生物、中文文本与二十四支签；</li>
+      <li>《三小时》由 numpy 手写加法合成、Karplus-Strong 拨弦与 Schroeder 混响，离线渲染 44.1kHz WAV，并另存 MIDI；</li>
+      <li>《星图》《字》由 Python + Pillow 程序化绘制，4× 超采样，固定随机种子；</li>
+      <li>《万物说明书》《留白》为原创文本，附 DOCX 排印版；</li>
+      <li>《时间胶囊》把日期派生的密钥流与明文异或，到日期后纯前端启封。</li>
+    </ul>
+    <div class="note">另外还有两件可以打印的东西：A4 <a class="inline" href="奇珍室_图录.pdf">展品图录</a>与四张一套的<a class="inline" href="奇珍室_明信片.pdf">明信片</a>。</div>
+  </section>
+
+  <section>
+    <h2>三条约定<i>PROMISES</i></h2>
+    <ol class="promise">
+      <li><b>不含任何真实人物的信息</b><span>没有人名、学校、单位、账号、网址，也没有引用任何私人文件。作品里出现的人名全部虚构。</span></li>
+      <li><b>不联网</b><span>没有 CDN、没有外链字体、没有统计脚本。断网、拔掉网线、把整个文件夹拷进一只旧 U 盘，它们仍然完好。</span></li>
+      <li><b>可被继续修改</b><span>每件作品都是单文件，代码没有压缩，生成脚本带注释与固定种子。欢迎拆开、改参数、重跑。</span></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>验收结果<i>VERIFIED</i></h2>
+    <ul class="check">
+      <li><b>14 个页面</b>（门户、说明 + 12 件展品）在 1440×900 与 390×844 两个视口下：<b>0</b> 个 JS 异常、<b>0</b> 条控制台错误、<b>0</b> 处横向溢出。</li>
+      <li>所有本地 <code>src</code> / <code>href</code> 引用均存在，无 404；返回链接逐一可达。</li>
+      <li>全站 <b>0</b> 个外部请求，断网可用。</li>
+      <li>《三小时》WAV：180.000 s / 44.1 kHz / 16 bit，峰值 −1.00 dBFS，无 NaN 与削波；播放、循环、跳段实测通过。</li>
+      <li>唯一需要人耳复核的：音乐 01:55–02:05 的音色平衡。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>目录结构<i>STRUCTURE</i></h2>
+    <div class="files">创造/
+├─ index.html              ← 快捷入口（自动跳转）
+├─ 00_从这里开始.html      ← 门户 / 策展前言
+├─ 奇珍室_图录.pdf          ← A4 图录，可打印装订
+├─ 奇珍室_明信片.pdf        ← A4 四张明信片，裁切即用
+├─ 01_涟漪/ … 12_回声/     ← 十二件展品，各自 index.html + README.md
+├─ _assets/                ← 制作说明、图录生成器、验收脚本、截图
+└─ README.md               ← 纯文本版说明</div>
+    <p class="body" style="margin-top:18px">每件展品目录里的 <b>README.md</b> 写明了该件的概念、操作方式与技术要点；<b>_assets/制作说明.md</b> 记录了完整实现与重跑方法。</p>
+  </section>
+
+  <section>
+    <h2>如果只来得及看三件<i>IF SHORT ON TIME</i></h2>
+    <div class="rec">
+      <a href="01_涟漪/index.html"><i>N°01</i><b>涟漪</b><span>点一下水面。它不回答，只是记住。</span></a>
+      <a href="03_造物机/index.html"><i>N°03</i><b>造物机</b><span>输入任何文字，得到一只不存在的生物。</span></a>
+      <a href="11_预言机/index.html"><i>N°11</i><b>预言机</b><span>写下你的问题，摇一支签。</span></a>
+    </div>
+  </section>
+
+  <footer>
+    <div>奇珍室 · A CABINET OF CURIOSITIES<br>十二件展品，全部离线，无一联网。</div>
+    <div style="text-align:right">创造 · 2026<br><b>FIN.</b></div>
+  </footer>
+</div>
+</body>
+</html>

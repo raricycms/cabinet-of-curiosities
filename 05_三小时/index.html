@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>三小时 · 奇珍室 N°05</title>
+<style>
+:root{
+  --ink-950:#080a0f; --ink-900:#0d1119; --ink-800:#141a24; --ink-700:#1e2633;
+  --line:#2a3442; --paper:#efe8da; --text:#e6e2d8; --text-dim:#98a1ac;
+  --amber:#d9a05b; --cyan:#6fb3a8;
+  --serif:"Noto Serif SC","Source Han Serif SC","STZhongsong","SimSun",serif;
+  --sans:"Noto Sans SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  --mono:"Cascadia Mono","Consolas","SFMono-Regular",monospace;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --wrap:1200px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#0d1119; color:var(--text);
+  font-family:var(--sans); font-size:16px; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh; overflow-x:hidden;
+  transition:background-color 1.2s linear;
+}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0a0e15}
+::-webkit-scrollbar-thumb{background:#232d3b;border:2px solid #0a0e15;border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:#31404f}
+html{scrollbar-color:#232d3b #0a0e15;scrollbar-width:thin}
+
+/* ---------- 返回 ---------- */
+.back{
+  position:fixed; top:0; left:0; z-index:20;
+  padding:22px 28px; font-size:13px; letter-spacing:.06em;
+  color:var(--text-dim); font-family:var(--mono);
+  transition:color .3s var(--ease);
+}
+.back:hover{color:var(--amber)}
+.back span{display:inline-block;transition:transform .3s var(--ease)}
+.back:hover span{transform:translateX(-4px)}
+
+main{
+  width:100%; max-width:var(--wrap); margin:0 auto;
+  padding:0 24px 0;
+}
+
+/* ---------- 顶部 ---------- */
+.top{
+  display:flex; justify-content:flex-end; align-items:baseline;
+  padding:26px 0 0;
+}
+.eyebrow{
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--text-dim);
+}
+.eyebrow b{color:var(--amber);font-weight:400}
+
+/* ---------- 标题区 ---------- */
+.hero{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:56px; padding:clamp(36px,7vh,84px) 0 clamp(32px,5vh,56px);
+  border-bottom:1px solid var(--line);
+}
+.hero-text{min-width:0}
+.kicker{
+  margin:0 0 20px; font-size:11px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--amber);
+}
+h1{
+  margin:0; font-family:var(--serif); font-weight:600;
+  font-size:clamp(46px,7.4vw,86px); line-height:1.06;
+  letter-spacing:.04em; color:var(--paper);
+}
+.lede{
+  margin:22px 0 0; max-width:34em;
+  font-size:clamp(15px,1.5vw,18px); color:var(--text); line-height:1.9;
+}
+.meta{
+  margin:20px 0 0; padding:0; list-style:none;
+  font-family:var(--mono); font-size:12px; letter-spacing:.08em;
+  color:var(--text-dim);
+}
+.meta li{display:inline}
+.meta li+li::before{content:"·";margin:0 .7em;color:var(--line)}
+.cover{
+  flex:0 0 auto; width:clamp(108px,16vw,208px); margin:0;
+  border:1px solid var(--line); line-height:0;
+  transition:border-color .4s var(--ease);
+}
+.cover:hover{border-color:#3a4658}
+.cover img{display:block;width:100%;height:auto}
+
+/* ---------- 播放器 ---------- */
+.player{padding:clamp(32px,5vh,52px) 0 0}
+.section-labels{
+  display:flex; font-family:var(--mono); font-size:11px;
+  letter-spacing:.1em; color:var(--text-dim); margin-bottom:14px;
+}
+.section-labels>span{
+  flex:1 1 0; min-width:0; padding-right:12px; transition:color .35s var(--ease);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.section-labels>span:last-child{text-align:right;padding-right:0}
+.section-labels>span.is-on{color:var(--amber)}
+.section-labels em{
+  font-style:normal; font-family:var(--serif); font-size:13px;
+  letter-spacing:.1em; margin-left:.5em; color:var(--text);
+}
+.section-labels>span.is-on em{color:var(--paper)}
+
+.wave-box{position:relative; cursor:pointer; touch-action:none}
+#wave{display:block;width:100%;height:clamp(96px,14vh,150px)}
+#wave:focus-visible{outline:1px solid var(--amber);outline-offset:6px}
+.tip{
+  position:absolute; top:-26px; left:0; transform:translateX(-50%);
+  font-family:var(--mono); font-size:11px; letter-spacing:.06em;
+  color:var(--paper); background:var(--ink-800);
+  border:1px solid var(--line); padding:1px 7px; border-radius:2px;
+  pointer-events:none; opacity:0; transition:opacity .18s var(--ease);
+  white-space:nowrap;
+}
+.tip.on{opacity:1}
+
+.controls{
+  display:flex; align-items:center; gap:clamp(14px,2.4vw,28px);
+  margin-top:18px; padding-top:18px; border-top:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.play{
+  flex:0 0 auto; width:52px; height:52px; border-radius:50%;
+  border:1px solid var(--line); background:transparent; color:var(--paper);
+  display:grid; place-items:center; cursor:pointer; padding:0;
+  transition:border-color .3s var(--ease),color .3s var(--ease),background-color .3s var(--ease);
+}
+.play:hover{border-color:var(--amber);color:var(--amber)}
+.play:active{background:rgba(217,160,91,.08)}
+.play svg{width:19px;height:19px;display:block;fill:currentColor}
+.play .i-pause{display:none}
+.play.is-playing .i-play{display:none}
+.play.is-playing .i-pause{display:block}
+
+.time{
+  font-family:var(--mono); font-size:13px; letter-spacing:.08em;
+  color:var(--text-dim); white-space:nowrap;
+}
+.time b{color:var(--paper);font-weight:400}
+
+.ctl{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--mono); font-size:12px; letter-spacing:.08em;
+  color:var(--text-dim);
+}
+.btn{
+  border:1px solid var(--line); background:transparent; color:var(--text-dim);
+  font-family:var(--mono); font-size:12px; letter-spacing:.08em;
+  padding:7px 13px; border-radius:2px; cursor:pointer;
+  display:flex; align-items:center; gap:8px;
+  transition:color .3s var(--ease),border-color .3s var(--ease);
+}
+.btn:hover{color:var(--text);border-color:#3a4658}
+.btn .dot{
+  width:6px;height:6px;border-radius:50%;background:var(--line);
+  transition:background-color .3s var(--ease),box-shadow .3s var(--ease);
+}
+.btn[aria-pressed="true"]{color:var(--amber);border-color:rgba(217,160,91,.45)}
+.btn[aria-pressed="true"] .dot{background:var(--amber);box-shadow:0 0 0 3px rgba(217,160,91,.14)}
+.btn:focus-visible,.play:focus-visible{outline:1px solid var(--amber);outline-offset:3px}
+
+.vol{margin-left:auto;display:flex;align-items:center;gap:12px}
+.vol svg{width:16px;height:16px;fill:currentColor;opacity:.75}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;background:transparent;
+  width:clamp(84px,12vw,140px); height:18px; cursor:pointer; margin:0;
+}
+input[type=range]::-webkit-slider-runnable-track{
+  height:1px;background:var(--line);
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:11px;height:11px;
+  border-radius:50%;background:var(--paper);margin-top:-5px;
+  transition:background-color .25s var(--ease);
+}
+input[type=range]:hover::-webkit-slider-thumb{background:var(--amber)}
+input[type=range]::-moz-range-track{height:1px;background:var(--line)}
+input[type=range]::-moz-range-thumb{
+  width:11px;height:11px;border:none;border-radius:50%;background:var(--paper);
+}
+input[type=range]:focus-visible{outline:1px solid var(--amber);outline-offset:4px}
+
+/* ---------- 三段说明 ---------- */
+.sections{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:0; margin-top:clamp(40px,6vh,64px);
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+.sec{
+  text-align:left; background:transparent; border:0; border-left:1px solid var(--line);
+  color:inherit; font:inherit; cursor:pointer; padding:26px 24px 30px;
+  display:block; width:100%;
+  transition:background-color .35s var(--ease);
+}
+.sec:first-child{border-left:0}
+.sec:hover{background:rgba(217,160,91,.035)}
+.sec:focus-visible{outline:1px solid var(--amber);outline-offset:-1px}
+.sec .t{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  color:var(--text-dim); display:flex; justify-content:space-between; gap:8px;
+  transition:color .35s var(--ease);
+}
+.sec .n{
+  font-family:var(--serif); font-size:clamp(22px,2.4vw,30px);
+  letter-spacing:.14em; color:var(--paper); margin:12px 0 10px;
+  font-weight:500; transition:color .35s var(--ease);
+}
+.sec .d{font-size:13.5px; line-height:1.85; color:var(--text-dim); margin:0}
+.sec.is-on{background:rgba(217,160,91,.05)}
+.sec.is-on .t{color:var(--amber)}
+.sec.is-on .n{color:var(--amber)}
+
+/* ---------- 说明 ---------- */
+.notes{
+  display:grid; grid-template-columns:1fr 1fr; gap:clamp(28px,4vw,64px);
+  padding:clamp(36px,5vh,56px) 0 clamp(28px,4vh,44px);
+}
+.notes h2{
+  font-family:var(--mono); font-size:11px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--amber); font-weight:400;
+  margin:0 0 14px;
+}
+.notes p{margin:0;font-size:14px;line-height:1.95;color:var(--text-dim)}
+.notes p+p{margin-top:10px}
+
+.files{
+  display:flex; flex-wrap:wrap; gap:10px; padding-bottom:clamp(40px,6vh,72px);
+}
+.files a{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:.1em;
+  color:var(--text-dim); border:1px solid var(--line); border-radius:2px;
+  padding:7px 12px; transition:color .3s var(--ease),border-color .3s var(--ease);
+}
+.files a:hover{color:var(--amber);border-color:rgba(217,160,91,.45)}
+
+footer{
+  border-top:1px solid var(--line);
+}
+.foot{
+  max-width:var(--wrap); margin:0 auto; padding:22px 24px 40px;
+  display:flex; justify-content:space-between; align-items:baseline; gap:20px;
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+  color:var(--text-dim);
+}
+.foot .no{color:var(--amber)}
+.foot .no i{font-style:normal;color:var(--text-dim)}
+
+/* ---------- 移动端 ---------- */
+@media (max-width:760px){
+  .back{padding:16px 18px;font-size:12px}
+  main{padding:0 18px}
+  .top{padding-top:52px}
+  .hero{flex-direction:row;align-items:flex-start;gap:20px;padding-top:34px}
+  .cover{width:88px;margin-top:6px}
+  h1{font-size:clamp(40px,13vw,58px)}
+  .lede{font-size:14.5px;line-height:1.85}
+  .meta{font-size:11px;line-height:2}
+  .meta li+li::before{margin:0 .45em}
+  .section-labels{font-size:10px}
+  .section-labels em{display:none}
+  .controls{gap:12px;row-gap:16px}
+  .play{width:46px;height:46px}
+  .vol{margin-left:0;width:100%;justify-content:flex-start}
+  .vol input[type=range]{flex:1;width:auto}
+  .sections{grid-template-columns:1fr}
+  .sec{border-left:0;border-top:1px solid var(--line);padding:22px 0 24px}
+  .sec:first-child{border-top:0}
+  .notes{grid-template-columns:1fr;gap:28px}
+  .foot{flex-direction:column;gap:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+  body{transition:none}
+}
+</style>
+</head>
+<body>
+<a class="back" href="../00_从这里开始.html"><span>←</span> 奇珍室</a>
+
+<main>
+  <div class="top">
+    <p class="eyebrow">奇珍室 · <b>N°05</b></p>
+  </div>
+
+  <section class="hero">
+    <div class="hero-text">
+      <p class="kicker">N° 05 — THREE HOURS</p>
+      <h1>三小时</h1>
+      <p class="lede">把三小时压进三分钟。一分钟一个时辰。<br>
+      子夜、破晓、黎明，各占六十秒。</p>
+      <ul class="meta">
+        <li>D 多利亚</li><li>60 BPM</li><li>180 s</li><li>44100 Hz / 16 bit</li><li>全曲手写合成</li>
+      </ul>
+    </div>
+    <figure class="cover">
+      <img src="封面.png" alt="《三小时》封面：三条水平线代表三个时辰" width="1600" height="1600">
+    </figure>
+  </section>
+
+  <section class="player" aria-label="播放器">
+    <div class="section-labels" id="labels">
+      <span data-sec="0">00:00–01:00<em>子夜</em></span>
+      <span data-sec="1">01:00–02:00<em>破晓</em></span>
+      <span data-sec="2">02:00–03:00<em>黎明</em></span>
+    </div>
+
+    <div class="wave-box" id="wavebox">
+      <canvas id="wave" tabindex="0" role="slider" aria-label="播放进度"
+              aria-valuemin="0" aria-valuemax="180" aria-valuenow="0" aria-valuetext="0 分 0 秒"></canvas>
+      <div class="tip" id="tip">00:00</div>
+    </div>
+
+    <div class="controls">
+      <button class="play" id="play" aria-label="播放" aria-pressed="false">
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4h4v16h-4zM13.5 4h4v16h-4z"/></svg>
+      </button>
+      <p class="time"><b id="t-cur">00:00</b> <span aria-hidden="true">/</span> <span id="t-tot">03:00</span></p>
+      <button class="btn" id="loop" aria-pressed="true" aria-label="循环播放"><span class="dot"></span>循环</button>
+      <div class="vol">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2-3.7v7.4a4.5 4.5 0 0 0 2-3.7z"/></svg>
+        <input id="vol" type="range" min="0" max="100" value="72" aria-label="音量">
+      </div>
+    </div>
+  </section>
+
+  <section class="sections" id="sections">
+    <button class="sec" data-sec="0">
+      <span class="t"><span>00:00 — 01:00</span><span>I</span></span>
+      <span class="n">子夜</span>
+      <p class="d">稀疏、单音、大量留白。像水滴落进空房间，和远处一口钟。</p>
+    </button>
+    <button class="sec" data-sec="1">
+      <span class="t"><span>01:00 — 02:00</span><span>II</span></span>
+      <span class="n">破晓</span>
+      <p class="d">琶音开始流动，第二个声部进来。和声一层层变暖，像天光慢慢渗进来。</p>
+    </button>
+    <button class="sec" data-sec="2">
+      <span class="t"><span>02:00 — 03:00</span><span>III</span></span>
+      <span class="n">黎明</span>
+      <p class="d">同一个动机展开、解决。最后一个音落下之后，混响还在原处响了很久。</p>
+    </button>
+  </section>
+
+  <section class="notes">
+    <div>
+      <h2>听法</h2>
+      <p>建议戴耳机，音量调低——它不需要你注意它。全曲只有一个动机，在三个时辰里被移调、倒影、增值，听第二遍才认得出来。</p>
+      <p>首尾各留了一点静默，循环播放不会跳一下。</p>
+    </div>
+    <div>
+      <h2>技术</h2>
+      <p>钟声为非谐分音（1 : 2.76 : 5.40 : 8.93）加指数衰减；拨弦是 Karplus-Strong 延迟线；铺底是微失谐正弦叠层，经一极点低通扫频；混响为 Schroeder 四梳状二全通，湿声约三成。</p>
+      <p>Python + numpy 逐样本合成，无采样、无网络。另附 MIDI 工程，可在 DAW 里继续改。</p>
+    </div>
+  </section>
+
+  <div class="files">
+    <a href="三小时.wav">三小时.wav · 30 MB</a>
+    <a href="三小时.mid">三小时.mid · 3 KB</a>
+    <a href="封面.png">封面.png · 1600×1600</a>
+    <a href="README.md">README.md</a>
+  </div>
+</main>
+
+<footer>
+  <div class="foot">
+    <span>奇珍室 · A CABINET OF CURIOSITIES</span>
+    <span class="no">奇珍室 · N°05 <i>/ 10</i></span>
+  </div>
+</footer>
+
+<audio id="au" src="三小时.wav" preload="metadata" loop></audio>
+
+<script>
+(function () {
+  "use strict";
+
+  var PEAKS = [0,2,5,12,21,35,56,74,83,79,116,122,311,359,344,297,311,276,250,229,242,237,224,202,213,241,229,220,223,246,270,272,249,249,186,189,170,146,179,200,534,228,214,197,222,216,180,156,164,192,170,203,185,178,191,173,163,536,381,259,220,199,127,159,172,174,153,167,314,263,226,251,319,309,316,307,302,303,253,215,172,180,228,254,561,217,230,221,215,208,165,177,189,172,171,204,217,207,182,260,218,262,297,300,285,213,193,187,288,323,342,318,279,321,333,312,277,288,373,376,305,317,360,324,363,388,300,256,305,318,304,243,230,245,245,309,275,231,238,235,229,262,224,615,274,195,201,235,283,268,266,217,214,209,200,222,228,219,237,232,273,219,209,213,194,215,443,218,227,213,194,205,220,200,228,219,211,202,223,203,171,197,234,211,198,216,243,259,311,281,316,345,345,266,261,215,271,265,267,263,210,174,168,200,204,570,342,260,223,204,206,220,295,254,246,230,202,212,222,293,522,427,323,307,310,280,295,311,248,259,210,170,173,242,285,328,307,325,246,250,289,269,319,319,323,268,268,275,254,277,295,266,232,236,224,528,276,255,276,283,290,277,300,291,282,282,239,203,215,185,208,233,255,275,260,253,452,396,234,298,318,304,261,247,239,257,269,299,301,209,202,195,280,235,296,336,304,364,369,329,282,268,249,201,164,181,227,245,263,288,279,556,247,259,322,357,390,379,394,388,345,332,318,282,269,252,311,345,326,484,422,374,338,342,336,317,428,337,298,355,351,353,318,341,366,371,361,351,325,358,317,318,339,331,280,308,324,467,346,274,314,342,290,289,308,297,292,273,263,281,292,277,207,564,413,225,301,333,359,482,409,457,341,304,298,531,525,442,383,367,388,421,603,474,388,298,336,315,560,451,441,402,350,309,479,386,358,366,321,408,586,442,358,322,332,340,475,353,364,381,363,266,287,487,341,283,237,195,207,466,375,263,258,234,262,468,438,337,325,322,290,528,415,379,314,301,281,258,610,406,363,336,362,307,478,424,420,343,359,400,536,501,459,486,413,314,510,477,355,375,381,344,651,576,353,346,290,478,405,295,285,337,564,444,384,343,532,479,387,322,356,829,640,446,401,377,502,476,369,364,505,518,378,366,382,581,442,403,313,334,633,392,403,357,621,496,383,387,360,524,349,320,575,437,312,302,378,530,497,359,330,323,601,479,532,582,587,476,443,416,436,610,543,484,527,492,544,344,375,475,671,621,419,424,418,654,508,434,376,420,382,437,367,308,514,469,361,354,392,504,411,326,684,344,262,544,327,239,579,432,368,561,591,374,637,590,475,496,656,528,521,627,472,450,632,514,455,713,648,556,705,624,459,687,680,556,687,706,474,794,783,500,747,716,512,407,602,363,432,607,485,415,636,492,325,573,425,351,580,526,500,573,488,410,641,582,512,626,506,412,592,467,466,494,640,469,450,725,437,443,652,438,331,588,470,487,594,475,472,444,416,453,619,633,507,697,734,538,567,518,444,374,684,410,302,551,364,392,585,392,386,569,440,435,720,550,428,663,579,325,631,547,458,608,680,429,810,797,639,691,706,511,419,619,515,453,610,537,513,688,477,365,603,478,554,668,538,436,577,406,332,572,528,419,509,513,349,315,573,404,391,573,390,414,680,496,453,635,528,440,702,668,505,706,566,334,576,401,320,266,287,493,383,400,470,536,611,523,477,371,570,572,419,453,394,407,491,517,533,529,576,635,649,577,596,531,551,488,530,668,595,505,487,422,683,569,552,481,614,521,589,615,400,571,473,551,807,645,565,454,487,685,535,452,533,679,617,570,761,867,716,567,536,498,573,751,644,618,441,569,532,442,439,522,673,626,510,518,386,529,635,596,516,608,588,418,482,592,660,618,508,390,391,462,517,376,972,611,475,447,541,502,488,495,565,728,664,575,582,608,1000,644,611,512,798,910,794,636,597,860,716,502,608,510,710,717,553,593,710,789,613,553,522,701,627,624,568,568,593,541,456,405,651,481,434,450,608,503,421,362,545,516,427,431,587,699,661,643,501,630,831,559,581,569,676,582,447,494,587,692,578,800,647,712,677,542,604,651,616,542,594,605,600,635,691,673,609,460,574,678,656,653,604,585,550,894,750,514,472,472,595,571,539,470,599,700,575,463,699,614,611,539,578,572,684,685,538,507,508,601,581,668,572,609,596,536,483,572,625,577,577,551,448,665,529,495,393,623,569,532,486,457,617,524,414,580,571,409,397,486,625,533,571,435,496,557,566,652,603,665,571,553,526,589,788,673,555,538,696,711,659,550,484,620,629,751,626,634,687,597,574,635,769,744,707,659,580,544,514,495,666,644,824,580,478,534,516,478,490,419,450,715,711,758,730,542,755,539,616,576,608,568,554,553,598,610,559,499,622,606,590,671,498,506,511,490,467,516,567,582,523,445,658,661,542,557,524,450,526,481,544,570,459,452,357,321,400,406,444,382,384,331,269,309,303,248,263,250,248,216,175,157,166,159,152,93,67,39,14,6];
+
+  var au = document.getElementById("au");
+  var cv = document.getElementById("wave");
+  var box = document.getElementById("wavebox");
+  var tip = document.getElementById("tip");
+  var btnPlay = document.getElementById("play");
+  var btnLoop = document.getElementById("loop");
+  var vol = document.getElementById("vol");
+  var tCur = document.getElementById("t-cur");
+  var tTot = document.getElementById("t-tot");
+  var secBtns = [].slice.call(document.querySelectorAll(".sec"));
+  var secLabels = [].slice.call(document.querySelectorAll("#labels > span"));
+
+  var DUR = 180;
+  var dur = DUR;
+  var cur = 0;
+  var playing = false;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var offDim = null, offLit = null, W = 0, H = 0, DPR = 1;
+
+  var BOUND = [0, 60, 120, 180];
+
+  function mmss(s) {
+    s = Math.max(0, Math.min(dur, s || 0));
+    var m = Math.floor(s / 60), x = Math.floor(s % 60);
+    return (m < 10 ? "0" : "") + m + ":" + (x < 10 ? "0" : "") + x;
+  }
+
+  function buildLayers() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth || 600;
+    H = cv.clientHeight || 120;
+    cv.width = Math.round(W * DPR);
+    cv.height = Math.round(H * DPR);
+
+    var n = Math.max(8, Math.floor(W / (W > 760 ? 4 : 3)));
+    var bw = Math.max(1, (W / n) - (W > 760 ? 1.4 : 1.2));
+    var mid = H / 2;
+    var maxH = H - 14;
+    var i, k, v, i0, i1, h, y;
+
+    function paint(color) {
+      var c = document.createElement("canvas");
+      c.width = cv.width; c.height = cv.height;
+      var g = c.getContext("2d");
+      g.setTransform(DPR, 0, 0, DPR, 0, 0);
+      g.fillStyle = color;
+      for (k = 0; k < n; k++) {
+        i0 = Math.floor(k * PEAKS.length / n);
+        i1 = Math.max(i0 + 1, Math.floor((k + 1) * PEAKS.length / n));
+        v = 0;
+        for (i = i0; i < i1; i++) { if (PEAKS[i] > v) v = PEAKS[i]; }
+        h = Math.max(2, (v / 1000) * maxH);
+        y = mid - h / 2;
+        var x = k * (W / n);
+        var w = Math.max(1, bw);
+        g.beginPath();
+        if (g.roundRect) { g.roundRect(x, y, w, h, w / 2); }
+        else { g.rect(x, y, w, h); }
+        g.fill();
+      }
+      return c;
+    }
+
+    offDim = paint("#2b3546");
+    offLit = paint("#d9a05b");
+    draw();
+  }
+
+  function draw() {
+    if (!offDim) { return; }
+    var g = cv.getContext("2d");
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, cv.width, cv.height);
+    g.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    g.drawImage(offDim, 0, 0, W, H);
+
+    var px = Math.max(0, Math.min(W, (cur / dur) * W));
+    if (px > 0) {
+      g.save();
+      g.beginPath(); g.rect(0, 0, px, H); g.clip();
+      g.drawImage(offLit, 0, 0, W, H);
+      g.restore();
+    }
+
+    // 三段分界
+    g.fillStyle = "rgba(42,52,66,.95)";
+    g.fillRect(Math.round(W / 3), 0, 1, H);
+    g.fillRect(Math.round(W * 2 / 3), 0, 1, H);
+
+    // 播放头
+    g.fillStyle = "#efe8da";
+    g.fillRect(Math.round(px), 4, 1, H - 8);
+    g.beginPath();
+    g.arc(px, 4, 2.5, 0, Math.PI * 2);
+    g.fill();
+  }
+
+  var lastSec = -1, lastTxt = "", lastActive = -1;
+
+  function syncUI() {
+    var i, s;
+    s = Math.min(2, Math.floor(cur / 60));
+
+    var txt = mmss(cur);
+    if (txt !== lastTxt) {
+      tCur.textContent = txt;
+      lastTxt = txt;
+    }
+
+    if (s !== lastActive) {
+      lastActive = s;
+      for (i = 0; i < 3; i++) {
+        secBtns[i].classList.toggle("is-on", i === s);
+        secLabels[i].classList.toggle("is-on", i === s);
+      }
+      cv.setAttribute("aria-valuenow", String(Math.round(cur)));
+      cv.setAttribute("aria-valuetext", txt);
+    }
+
+    if (playing !== wasPlaying) {
+      wasPlaying = playing;
+      btnPlay.classList.toggle("is-playing", playing);
+      btnPlay.setAttribute("aria-pressed", playing ? "true" : "false");
+      btnPlay.setAttribute("aria-label", playing ? "暂停" : "播放");
+    }
+
+    // 天光：越往后越暖一点点
+    var p = Math.max(0, Math.min(1, cur / dur));
+    var r = Math.round(13 + 6 * p), gg = Math.round(17 + 0.5 * p), b = Math.round(25 - 11 * p);
+    document.body.style.backgroundColor = "rgb(" + r + "," + gg + "," + b + ")";
+  }
+  var wasPlaying = false;
+
+  // ---- 播放控制 ----
+  function toggle() {
+    if (au.paused) {
+      var pr = au.play();
+      if (pr && pr.catch) { pr.catch(function () {}); }
+    } else {
+      au.pause();
+    }
+  }
+
+  btnPlay.addEventListener("click", toggle);
+
+  au.addEventListener("play", function () { playing = true; syncUI(); });
+  au.addEventListener("pause", function () { playing = false; syncUI(); });
+  au.addEventListener("loadedmetadata", function () {
+    if (isFinite(au.duration) && au.duration > 0) { dur = au.duration; }
+    tTot.textContent = mmss(dur);
+    cv.setAttribute("aria-valuemax", Math.round(dur));
+    syncUI();
+  });
+  au.addEventListener("timeupdate", function () { cur = au.currentTime; draw(); syncUI(); });
+  au.addEventListener("ended", function () { playing = false; syncUI(); });
+  au.addEventListener("error", function () {
+    tTot.textContent = "--:--";
+    tip.textContent = "音频未载入";
+    tip.classList.add("on");
+  });
+
+  var raf = 0;
+  function tick() {
+    if (!playing) { return; }
+    cur = au.currentTime;
+    draw();
+    syncUI();
+    raf = requestAnimationFrame(tick);
+  }
+  au.addEventListener("play", function () {
+    if (raf) { cancelAnimationFrame(raf); }
+    if (!reduce) { raf = requestAnimationFrame(tick); }
+  });
+  au.addEventListener("pause", function () {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  });
+
+  // ---- 循环 ----
+  btnLoop.addEventListener("click", function () {
+    var on = btnLoop.getAttribute("aria-pressed") !== "true";
+    btnLoop.setAttribute("aria-pressed", on ? "true" : "false");
+    au.loop = on;
+  });
+
+  // ---- 音量 ----
+  au.volume = Number(vol.value) / 100;
+  vol.addEventListener("input", function () {
+    au.volume = Number(vol.value) / 100;
+  });
+
+  // ---- 进度条拖动 / 点击 ----
+  var dragging = false;
+
+  function posToTime(clientX) {
+    var r = box.getBoundingClientRect();
+    var p = (clientX - r.left) / Math.max(1, r.width);
+    return Math.max(0, Math.min(1, p)) * dur;
+  }
+
+  function seek(t) {
+    cur = t;
+    au.currentTime = t;
+    draw();
+    syncUI();
+  }
+
+  box.addEventListener("pointerdown", function (e) {
+    dragging = true;
+    if (box.setPointerCapture) {
+      try { box.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    seek(posToTime(e.clientX));
+  });
+  box.addEventListener("pointermove", function (e) {
+    var r = box.getBoundingClientRect();
+    var p = Math.max(0, Math.min(1, (e.clientX - r.left) / Math.max(1, r.width)));
+    tip.textContent = mmss(p * dur);
+    tip.style.left = (p * r.width) + "px";
+    tip.classList.add("on");
+    if (dragging) { seek(p * dur); }
+  });
+  box.addEventListener("pointerup", function (e) {
+    dragging = false;
+    if (box.releasePointerCapture) {
+      try { box.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+  });
+  box.addEventListener("pointerleave", function () {
+    if (!dragging) { tip.classList.remove("on"); }
+  });
+  box.addEventListener("pointercancel", function () { dragging = false; });
+
+  // ---- 段落卡片 / 标签点击跳转 ----
+  function jump(i) {
+    seek(BOUND[i]);
+    if (au.paused) {
+      var pr = au.play();
+      if (pr && pr.catch) { pr.catch(function () {}); }
+    }
+  }
+  secBtns.forEach(function (b) {
+    b.addEventListener("click", function () { jump(Number(b.getAttribute("data-sec"))); });
+  });
+
+  // ---- 键盘 ----
+  document.addEventListener("keydown", function (e) {
+    var tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") { return; }
+    if (e.code === "Space" || e.key === " ") {
+      e.preventDefault(); toggle();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault(); seek(Math.min(dur, cur + 5));
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault(); seek(Math.max(0, cur - 5));
+    } else if (e.key === "Home") {
+      e.preventDefault(); seek(0);
+    }
+  });
+
+  // ---- 尺寸 ----
+  var rt = 0;
+  window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { buildLayers(); }, 120);
+  });
+
+  buildLayers();
+  syncUI();
+  tTot.textContent = mmss(DUR);
+})();
+</script>
+</body>
+</html>
